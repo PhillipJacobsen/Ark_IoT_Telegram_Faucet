@@ -110,8 +110,8 @@ uint8_t led_status;
 
 /**************************************************************************************************/
 // blockchain stuff
-const char* FaucetAddress = "TEf7p5jf1LReywuits5orBsmpkMe8fLTkk";   //RADIANS testnet address that holds faucet funds
-static const auto PASSPHRASE  = "canal pride surprise flat twist genre access weekend wonder task charge whale";
+const char* FaucetAddress = "TCpoh6TYY8KZnwamGgmgTRcp5k9ycumH83";   //RADIANS testnet address that holds faucet funds
+static const auto PASSPHRASE  = "often power release space funny lend mango blood pet ribbon scene what";
 const char* ARK_PEER = "37.34.60.90";  //RADIANS Testnet Peer
 int ARK_PORT = 4040;
 #include <arkCrypto.h>
@@ -325,7 +325,7 @@ void loop()
         //--------------------------------------------
         sendBridgechainTransaction();
 
-        Bot.sendMessage(Bot.received_msg.chat.id, "coins have been sent");
+
       }
 
       else {

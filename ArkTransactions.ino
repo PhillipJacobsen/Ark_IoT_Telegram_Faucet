@@ -142,11 +142,14 @@ void sendBridgechainTransaction() {
   const char* data_broadcast_0 = data["broadcast"][0]; // "bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2"
 
   yield();
-  Bot.sendMessage(Bot.received_msg.chat.id, "TransactionID:");
+  Bot.sendMessage(Bot.received_msg.chat.id, "10 RAD have been sent");
+
+  //Bot.sendMessage(Bot.received_msg.chat.id, "TransactionID:");
   //Bot.sendMessage(Bot.received_msg.chat.id, data_accept_0);
 
-  char explorerlink[100];
-  strcpy(explorerlink, "https://radians.nl/#/transaction/");
+  char explorerlink[150];
+  strcpy(explorerlink, "TransactionID:  ");
+  strcat(explorerlink, "https://radians.nl/#/transaction/");
   strcat(explorerlink, data_accept_0);
   Bot.sendMessage(Bot.received_msg.chat.id, explorerlink);
 
