@@ -46,10 +46,13 @@
 #define TLG_TOKEN "833803898:AAG9mcKAEzdd7W7p_RtjIZqp48Lt4X-tTMw"
 #define telegram_chat_id "-1001491687302"  //Add @RawDataBot to your group chat to find the chat id.
 
+// from tlgcert.h
+// Note: This certificate will expire 23/05/2020. After that date, Telegram will get a new one so 
+// you must check for it and change it here
 
 // Enable Bot debug level (0 - None; 1 - Bot Level; 2 - Bot+HTTPS Level)
-#define DEBUG_LEVEL_UTLGBOT 0
-
+#define DEBUG_LEVEL_UTLGBOT 2
+#define UTLGBOT_MEMORY_LEVEL 4
 // Board Led Pin
 #define PIN_LED 13
 
