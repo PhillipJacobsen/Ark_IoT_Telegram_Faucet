@@ -47,7 +47,7 @@
 #define telegram_chat_id "-1001491687302"  //Add @RawDataBot to your group chat to find the chat id.
 
 // from tlgcert.h
-// Note: This certificate will expire 23/05/2020. After that date, Telegram will get a new one so 
+// Note: This certificate will expire 23/05/2020. After that date, Telegram will get a new one so
 // you must check for it and change it here
 
 // Enable Bot debug level (0 - None; 1 - Bot Level; 2 - Bot+HTTPS Level)
@@ -84,8 +84,9 @@ const char TEXT_HELP[] =
   "/ledoff - Turn off the LED.\n"
   "/ledstatus - Show actual LED status.\n"
   "/address - Returns wallet address of faucet.\n"
-  "/balance - Returns balance of wallet.\n"
-  "/request\\_WALLETADDRESS : replace WALLETADDRESS with your address";
+  "/balance - Returns balance of faucet wallet.\n"
+  "/request\\_WALLETADDRESS : replace WALLETADDRESS with your address.\n"
+  "/mybalance\\_MYBALANCE : replace MYBALANCE with your address.";
 
 
 /**************************************************************************************************/
@@ -163,7 +164,13 @@ struct wallet {
 };
 struct wallet bridgechainWallet;
 
-char receiveaddress_char[34+1];
+char receiveaddress_char[34 + 1];
+
+char mybalanceAddress_char[34 + 1];
+char mywalletBalance[64 + 1];             //current balance
+uint64_t mywalletBalance_Uint64 = 0ULL;   //current balance
+
+
 /**************************************************************************************************/
 
 
@@ -303,22 +310,53 @@ void loop()
       Bot.sendMessage(Bot.received_msg.chat.id, bridgechainWallet.walletBalance);
     }
 
+
+    //--------------------------------------------
+    // If /mybalance_ command was received
+    //--------------------------------------------
+    else if (strncmp(Bot.received_msg.text, "/mybalance_", strlen("/mybalance_")) == 0)
+    {
+      String mybalance = String(Bot.received_msg.text);
+      if (mybalance.charAt(11) == 'T')  {        //simple address verification
+        String mybalanceAddress = mybalance.substring(11, 11 + 34 + 1);       //Ark address is 34 digits long
+        Serial.print("\naddress: ");
+        Serial.print(mybalanceAddress);
+
+ 
+        //--------------------------------------------
+        mybalanceAddress.toCharArray(mybalanceAddress_char, 34 + 1);
+        Serial.print("\nreceiveAddress char: ");
+        Serial.print(mybalanceAddress_char);
+
+                
+        //--------------------------------------------
+        // Retrieve Wallet Nonce from blockchain before sending transaction
+        getWallet_requested(mybalanceAddress_char);
+        Bot.sendMessage(Bot.received_msg.chat.id, "Your balance is:");
+        Bot.sendMessage(Bot.received_msg.chat.id, mywalletBalance);
+      }
+      else {
+        break;
+      }
+    }
+
+
     //--------------------------------------------
     // If /request_ command was received
     else if (strncmp(Bot.received_msg.text, "/request_", strlen("/request_")) == 0)
     {
-      String RequestAddress = String(Bot.received_msg.text);
-      if (RequestAddress.charAt(9) == 'T')  {        //simple address verification
-        String receiveaddress = RequestAddress.substring(9, 9 + 34 + 1);       //Ark address is 34 digits long
+      String request = String(Bot.received_msg.text);
+      if (request.charAt(9) == 'T')  {        //simple address verification
+        String receiveaddress = request.substring(9, 9 + 34 + 1);       //Ark address is 34 digits long
         Serial.print("\nreceiveAddress: ");
         Serial.print(receiveaddress);
 
         //--------------------------------------------
         // Retrieve Wallet Nonce from blockchain before sending transaction
         getWallet();
-      
+
         //--------------------------------------------
-        receiveaddress.toCharArray(receiveaddress_char, 34+1);
+        receiveaddress.toCharArray(receiveaddress_char, 34 + 1);
         Serial.print("\nreceiveAddress char: ");
         Serial.print(receiveaddress_char);
 

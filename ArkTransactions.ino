@@ -94,7 +94,24 @@ void getWallet() {
 
 
 
+void getWallet_requested(char * mybalanceAddress_char) {
+  const auto walletGetResponse = connection.api.wallets.get(mybalanceAddress_char);
 
+  const size_t capacity = JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(6) + 200;
+  DynamicJsonDocument doc(capacity);
+
+  deserializeJson(doc, walletGetResponse.c_str());
+  JsonObject data = doc["data"];
+  strcpy(mywalletBalance, data["balance"]);                     //copy into global character array
+  mywalletBalance_Uint64 = strtoull(data["balance"], NULL, 10); //convert string to unsigned long long
+
+  Serial.println("\n=================================");
+  Serial.println("Retrieving wallet Balance");
+  Serial.print("Get Wallet Response");
+  Serial.println(walletGetResponse.c_str());                                    // The response is a 'std::string', to Print on Arduino, we need the c_string type.
+  Serial.print("Balance: ");
+  Serial.println(mywalletBalance);
+}
 
 
 /********************************************************************************
