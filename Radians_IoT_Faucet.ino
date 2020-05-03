@@ -44,7 +44,13 @@ const int BAT_PIN = 35;     //ADC connected to Battery input pin (A13 = 35;)
 #else
 #include <WiFi.h>
 #endif
-// Custom libraries
+
+
+/********************************************************************************
+    utlgbotlib Telegram bot Library by JRios Version 1.0.0
+    https://github.com/J-Rios/uTLGBotLib-arduino
+    
+********************************************************************************/
 #include <utlgbotlib.h>
 
 /**************************************************************************************************/
@@ -173,7 +179,6 @@ uint64_t mywalletBalance_Uint64 = 0ULL;   //current balance
 ********************************************************************************/
 void loop()
 {
-
   //--------------------------------------------
   // Check if WiFi is connected
   if (!wifi_handle_connection())
@@ -191,65 +196,4 @@ void loop()
     telegramBotHandler();
   }
 
-
-  // Wait 1s for next iteration
-  delay(1000);
 }
-
-/**************************************************************************************************/
-
-/********************************************************************************
-  WiFi Initialization Handler
-********************************************************************************/
-// Init WiFi interface
-void wifi_init_stat(void)
-{
-  Serial.println("Initializing TCP-IP adapter...");
-  Serial.print("Wifi connecting to SSID: ");
-  Serial.println(WIFI_SSID);
-
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-
-  Serial.println("TCP-IP adapter successfuly initialized.");
-}
-
-
-/********************************************************************************
-  WiFi Connection Event Handler
-********************************************************************************/
-bool wifi_handle_connection(void)
-{
-  static bool wifi_connected = false;
-
-  // Device is not connected
-  if (WiFi.status() != WL_CONNECTED)
-  {
-    // Was connected
-    if (wifi_connected)
-    {
-      Serial.println("WiFi disconnected.");
-      wifi_connected = false;
-    }
-
-    return false;
-  }
-  // Device connected
-  else
-  {
-    // Wasn't connected
-    if (!wifi_connected)
-    {
-      Serial.println("");
-      Serial.println("WiFi connected");
-      Serial.print("IP address: ");
-      Serial.println(WiFi.localIP());
-
-      wifi_connected = true;
-    }
-
-    return true;
-  }
-}
-
-/**************************************************************************************************/
