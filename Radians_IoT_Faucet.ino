@@ -151,8 +151,8 @@ struct wallet {
   uint64_t walletNonce_Uint64 = 1ULL;     //current nonce
 };
 struct wallet bridgechainWallet;
-          
 
+char receiveaddress_char[40];
 /**************************************************************************************************/
 
 
@@ -279,8 +279,52 @@ void loop()
     // If /address command was received
     else if (strncmp(Bot.received_msg.text, "/address", strlen("/address")) == 0)
     {
-        Bot.sendMessage(Bot.received_msg.chat.id, FaucetAddress);
+      Bot.sendMessage(Bot.received_msg.chat.id, FaucetAddress);
     }
+
+    //--------------------------------------------
+    // If /balance command was received
+    else if (strncmp(Bot.received_msg.text, "/balance", strlen("/balance")) == 0)
+    {
+      //--------------------------------------------
+      //  Retrieve Wallet Nonce and Balance
+      getWallet();
+      Bot.sendMessage(Bot.received_msg.chat.id, bridgechainWallet.walletBalance);
+    }
+
+    //--------------------------------------------
+    // If /request_ command was received
+    else if (strncmp(Bot.received_msg.text, "/request_", strlen("/request_")) == 0)
+    {
+      String RequestAddress = String(Bot.received_msg.text);
+      if (RequestAddress.charAt(9) == 'T')  {        //simple address verification
+        String receiveaddress = RequestAddress.substring(9, 9 + 34 + 1);       //Ark address is 34 digits long
+        Serial.print("\nreceiveAddress: ");
+        Serial.print(receiveaddress);
+
+        //--------------------------------------------
+        // Retrieve Wallet Nonce from blockchain before sending transaction
+        getWallet();
+      
+        //--------------------------------------------
+        receiveaddress.toCharArray(receiveaddress_char, 35);
+        Serial.print("\nreceiveAddress char: ");
+        Serial.print(receiveaddress_char);
+
+        //--------------------------------------------
+        sendBridgechainTransaction();
+
+        Bot.sendMessage(Bot.received_msg.chat.id, "coins have been sent");
+      }
+
+      else {
+        break;
+      }
+
+
+
+    }
+
 
 
 

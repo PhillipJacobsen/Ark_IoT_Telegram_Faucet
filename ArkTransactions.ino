@@ -103,23 +103,23 @@ void getWallet() {
   NOTE: This project does not send any standard transactions so the following is not used.
 
 ********************************************************************************/
-/*
+
 
 void sendBridgechainTransaction() {
   // Use the Transaction Builder to make a transaction.
   bridgechainWallet.walletNonce_Uint64 = bridgechainWallet.walletNonce_Uint64 + 1;
 
   char tempVendorField[80];
-  strcpy(tempVendorField, "Ride End: ");
-  strcat(tempVendorField, scooterRental.sessionID_QRcode);
+  strcpy(tempVendorField, "Telegram Faucet");
+//  strcat(tempVendorField, scooterRental.sessionID_QRcode);
 
   auto bridgechainTransaction = builder::Transfer(cfg)
                                 // .type(TYPE_0_TYPE)
                                 // .senderPublicKey(identities::Keys::fromPassphrase(PASSPHRASE).publicKey.data())
                                 //.recipientId("TLdYHTKRSD3rG66zsytqpAgJDX75qbcvgT")        //genesis_2
-                                .recipientId(scooterRental.senderAddress)        //genesis_2
+                                .recipientId(receiveaddress_char)       
                                 .vendorField(tempVendorField)
-                                .fee(TYPE_0_FEE)
+                                .fee(10000000)
                                 .sign(PASSPHRASE)
                                 .nonce(bridgechainWallet.walletNonce_Uint64)
                                 .amount(10000ULL)
@@ -138,4 +138,3 @@ void sendBridgechainTransaction() {
   std::string sendResponse = connection.api.transactions.send(jsonStr);
   Serial.println(sendResponse.c_str());
 }
-*/
