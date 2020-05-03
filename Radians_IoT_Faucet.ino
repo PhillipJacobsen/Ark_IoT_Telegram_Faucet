@@ -152,7 +152,7 @@ struct wallet {
 };
 struct wallet bridgechainWallet;
 
-char receiveaddress_char[40];
+char receiveaddress_char[34+1];
 /**************************************************************************************************/
 
 
@@ -307,7 +307,7 @@ void loop()
         getWallet();
       
         //--------------------------------------------
-        receiveaddress.toCharArray(receiveaddress_char, 35);
+        receiveaddress.toCharArray(receiveaddress_char, 34+1);
         Serial.print("\nreceiveAddress char: ");
         Serial.print(receiveaddress_char);
 

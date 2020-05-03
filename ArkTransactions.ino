@@ -114,17 +114,12 @@ void sendBridgechainTransaction() {
 //  strcat(tempVendorField, scooterRental.sessionID_QRcode);
 
   auto bridgechainTransaction = builder::Transfer(cfg)
-                                // .type(TYPE_0_TYPE)
-                                // .senderPublicKey(identities::Keys::fromPassphrase(PASSPHRASE).publicKey.data())
-                                //.recipientId("TLdYHTKRSD3rG66zsytqpAgJDX75qbcvgT")        //genesis_2
                                 .recipientId(receiveaddress_char)       
-                                .vendorField(tempVendorField)
-                                .fee(10000000)
-                                .sign(PASSPHRASE)
+                                //.vendorField(tempVendorField)
+                                .fee(1000000)
                                 .nonce(bridgechainWallet.walletNonce_Uint64)
-                                .amount(10000ULL)
-                                .expiration(0UL)
-                                //  .secondSign(SecondPassphrase)
+                                .amount(1000000000)
+                                .sign(PASSPHRASE)
                                 .build();
 
   const auto transactionJson = bridgechainTransaction.toJson();
@@ -132,8 +127,8 @@ void sendBridgechainTransaction() {
 
   bridgechainTransaction.sign(PASSPHRASE);
 
-  char transactionsBuffer[600];
-  snprintf(&transactionsBuffer[0], 600, "{\"transactions\":[%s]}", bridgechainTransaction.toJson().c_str());
+  char transactionsBuffer[1500];
+  snprintf(&transactionsBuffer[0], 1500, "{\"transactions\":[%s]}", bridgechainTransaction.toJson().c_str());
   std::string jsonStr = transactionsBuffer;
   std::string sendResponse = connection.api.transactions.send(jsonStr);
   Serial.println(sendResponse.c_str());
