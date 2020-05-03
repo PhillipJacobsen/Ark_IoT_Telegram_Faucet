@@ -127,15 +127,15 @@ void sendBridgechainTransaction() {
   bridgechainWallet.walletNonce_Uint64 = bridgechainWallet.walletNonce_Uint64 + 1;
 
   char tempVendorField[80];
-  strcpy(tempVendorField, "Telegram Faucet");
+  strcpy(tempVendorField, PAYOUT_MESSAGE);
   //  strcat(tempVendorField, scooterRental.sessionID_QRcode);
 
   auto bridgechainTransaction = builder::Transfer(cfg)
                                 .recipientId(receiveaddress_char)
-                                .vendorField(tempVendorField)
+                                .vendorField(PAYOUT_MESSAGE)
                                 .fee(1000000)
                                 .nonce(bridgechainWallet.walletNonce_Uint64)
-                                .amount(1000000000)
+                                .amount(PAYOUT_AMOUNT_UINT64)
                                 .sign(PASSPHRASE)
                                 .build();
 
@@ -159,7 +159,7 @@ void sendBridgechainTransaction() {
   const char* data_broadcast_0 = data["broadcast"][0]; // "bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2"
 
   yield();
-  Bot.sendMessage(Bot.received_msg.chat.id, "10 RAD have been sent");
+  Bot.sendMessage(Bot.received_msg.chat.id, "Coins have been sent");
 
   //Bot.sendMessage(Bot.received_msg.chat.id, "TransactionID:");
   //Bot.sendMessage(Bot.received_msg.chat.id, data_accept_0);

@@ -1,7 +1,6 @@
 /********************************************************************************
     Radians Ark.io BridgeChain IoT Faucet
     This projects runs on an ESP8266 or ESP32 microcontroller and provides a way to easily send Ark Bridgechain Cryptocurrency to a wallet address that is sent via Telegram app.
-    This faucet is intended to provide a simple way to distribute free tokens on a testnet during development.
 
     Radians_IoT_faucet.ino
     2020 @phillipjacobsen
@@ -19,11 +18,19 @@
     payoutCooldown - for how long will user not be able to request a payment for
     dailyPayoutLimit - what's the faucet's max (overall) daily payout
 ********************************************************************************/
+
+/********************************************************************************
+                              Private Data
+  IMPORTANT - Modify the secrets.h file with your secure network connection details
+********************************************************************************/
+#include "secrets.h"
+
 // Standard C/C++ libraries
-#include <string.h>
+//#include <string.h>
 
 // Device libraries (Arduino ESP32/ESP8266 Cores)
-#include <Arduino.h>
+//#include <Arduino.h>
+
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
 #else
@@ -33,33 +40,14 @@
 #include <utlgbotlib.h>
 
 /**************************************************************************************************/
-
-// WiFi Parameters
-#define WIFI_SSID "TELUS0183"
-#define WIFI_PASS "6z5g4hbdxi"
-
+//WiFi Parameters required by Telegram Library
 #define MAX_CONN_FAIL 50
 #define MAX_LENGTH_WIFI_SSID 31
 #define MAX_LENGTH_WIFI_PASS 63
 
-// Telegram Bot Token (Get from Botfather)
-#define TLG_TOKEN "833803898:AAG9mcKAEzdd7W7p_RtjIZqp48Lt4X-tTMw"
-#define telegram_chat_id "-1001491687302"  //Add @RawDataBot to your group chat to find the chat id.
 
-// from tlgcert.h
-// Note: This certificate will expire 23/05/2020. After that date, Telegram will get a new one so
-// you must check for it and change it here
 
-// Enable Bot debug level (0 - None; 1 - Bot Level; 2 - Bot+HTTPS Level)
-#define DEBUG_LEVEL_UTLGBOT 2
-#define UTLGBOT_MEMORY_LEVEL 4
 
-//-DUTLGBOT_MEMORY_LEVEL=0 // Max TLG msgs:  128 chars
-//-DUTLGBOT_MEMORY_LEVEL=1 // Max TLG msgs:  256 chars
-//-DUTLGBOT_MEMORY_LEVEL=2 // Max TLG msgs:  512 chars
-//-DUTLGBOT_MEMORY_LEVEL=3 // Max TLG msgs: 1024 chars
-//-DUTLGBOT_MEMORY_LEVEL=4 // Max TLG msgs: 2048 chars
-//-DUTLGBOT_MEMORY_LEVEL=5 // Max TLG msgs: 4097 chars (telegram max msg length)
 
 // Board Led Pin
 #define PIN_LED 13
@@ -110,11 +98,7 @@ uint8_t led_status;
 
 
 /**************************************************************************************************/
-// blockchain stuff
-const char* FaucetAddress = "TCpoh6TYY8KZnwamGgmgTRcp5k9ycumH83";   //RADIANS testnet address that holds faucet funds
-static const auto PASSPHRASE  = "often power release space funny lend mango blood pet ribbon scene what";
-const char* ARK_PEER = "37.34.60.90";  //RADIANS Testnet Peer
-int ARK_PORT = 4040;
+
 #include <arkCrypto.h>
 #include "arkCrypto_esp32.h"  // This is a helper header that includes all the Misc ARK C++ Crypto headers required for this sketch
 #include "transactions/builders/radians/radians.hpp"
@@ -124,14 +108,7 @@ using namespace Ark::Crypto;
 using namespace Ark::Crypto::identities;
 using namespace Ark::Crypto::transactions;
 
-// Configure Bridgechain Parameters
-static const auto BRIDGECHAIN_NETHASH   = "f39a61f04d6136a690a0b675ef6eedbd053665bd343b4e4f03311f12065fb875"; // std::string
-static const auto BRIDGECHAIN_SLIP44    = 1;          // uint8_t
-static const auto BRIDGECHAIN_WIF       = 0xCE;       // uint8_t
-static const auto BRIDGECHAIN_VERSION   = 0x41;       // uint8_t
-static const auto BRIDGECHAIN_EPOCH     = "2019-10-25T09:05:40.856Z";  // std::string
-
-// BridgeChain Network Structure Model.  see Ark-Cpp-Crypto\src\common\network.hpp
+// BridgeChain Network Structure Model.
 // These are defined in secrets.h
 const Network BridgechainNetwork = {
   BRIDGECHAIN_NETHASH,
@@ -146,7 +123,7 @@ const Configuration cfg(BridgechainNetwork);
 
 
 /********************************************************************************
-  Ark Client Library (version 1.4.0)
+  Ark Client Library (version 1.4.1)
 ********************************************************************************/
 #include <arkClient.h>
 Ark::Client::Connection<Ark::Client::Api> connection(ARK_PEER, ARK_PORT);   // create ARK blockchain connection
@@ -307,6 +284,7 @@ void loop()
       //--------------------------------------------
       //  Retrieve Wallet Nonce and Balance
       getWallet();
+      Bot.sendMessage(Bot.received_msg.chat.id, "faucet balance:");
       Bot.sendMessage(Bot.received_msg.chat.id, bridgechainWallet.walletBalance);
     }
 
@@ -322,13 +300,13 @@ void loop()
         Serial.print("\naddress: ");
         Serial.print(mybalanceAddress);
 
- 
+
         //--------------------------------------------
         mybalanceAddress.toCharArray(mybalanceAddress_char, 34 + 1);
         Serial.print("\nreceiveAddress char: ");
         Serial.print(mybalanceAddress_char);
 
-                
+
         //--------------------------------------------
         // Retrieve Wallet Nonce from blockchain before sending transaction
         getWallet_requested(mybalanceAddress_char);
@@ -355,10 +333,14 @@ void loop()
         // Retrieve Wallet Nonce from blockchain before sending transaction
         getWallet();
 
+        yield();
+
         //--------------------------------------------
         receiveaddress.toCharArray(receiveaddress_char, 34 + 1);
         Serial.print("\nreceiveAddress char: ");
         Serial.print(receiveaddress_char);
+
+        yield();
 
         //--------------------------------------------
         sendBridgechainTransaction();
