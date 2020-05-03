@@ -14,7 +14,6 @@
 // Enable Bot debug level (0 - None; 1 - Bot Level; 2 - Bot+HTTPS Level)
 #define DEBUG_LEVEL_UTLGBOT 2
 #define UTLGBOT_MEMORY_LEVEL 4
-
 //-DUTLGBOT_MEMORY_LEVEL=0 // Max TLG msgs:  128 chars
 //-DUTLGBOT_MEMORY_LEVEL=1 // Max TLG msgs:  256 chars
 //-DUTLGBOT_MEMORY_LEVEL=2 // Max TLG msgs:  512 chars
@@ -29,7 +28,7 @@
 
 //int8_t TIME_ZONE = -6;      //set timezone:  MST (use this in summer)
 int8_t TIME_ZONE = -7;        //set timezone:  MST (use this in winter)
-int16_t DST = 0;              //To enable Daylight saving time set it to 3600. Otherwise, set it to 0. This does not seem to work!!
+int16_t DST = 3600;           //To enable Daylight saving time set it to 3600. Otherwise, set it to 0. I am not sure if this actually works. Need to confirm in the fall...
 
 // Configure Radians Wallet for Faucet
 const char* FaucetAddress = "TCpoh6TYY8KZnwamGgmgTRcp5k9ycumH83";   //RADIANS testnet address that holds faucet funds

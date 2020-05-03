@@ -20,10 +20,18 @@
 ********************************************************************************/
 
 /********************************************************************************
-                              Private Data
-  IMPORTANT - Modify the secrets.h file with your secure network connection details
+                              Private Data & Configuration
+  IMPORTANT - Modify the secrets.h file with your network connection and configuration details
 ********************************************************************************/
 #include "secrets.h"
+
+/********************************************************************************
+                            Misc I/O Definitions
+********************************************************************************/
+const int LED_PIN = 13;     //LED integrated on Adafruit HUZZAH32 module
+const int BAT_PIN = 35;     //ADC connected to Battery input pin (A13 = 35;)
+//const int DAC1 = 25;      //declared in \packages\esp32\hardware\esp32\1.0.4\variants\feather_esp32/pins_arduino.h
+//const int DAC2 = 26;
 
 // Standard C/C++ libraries
 //#include <string.h>
@@ -47,10 +55,18 @@
 
 
 
+/********************************************************************************
+  Time Library
+  required for internal clock to syncronize with NTP server.
+********************************************************************************/
+#include "time.h"
 
 
-// Board Led Pin
-#define PIN_LED 13
+/********************************************************************************
+  Update Intervals for various algorithms
+********************************************************************************/
+uint32_t UpdateInterval_TelegramBot = 1000;           // 1000ms
+uint32_t previousUpdateTime_TelegramBot = millis();
 
 // Telegram Bot /start text message
 
@@ -77,14 +93,14 @@ const char TEXT_HELP[] =
   "/mybalance\\_MYBALANCE : replace MYBALANCE with your address.";
 
 
-/**************************************************************************************************/
-
-/* Functions Prototypes */
-
+/********************************************************************************
+  Function prototypes
+  Arduino IDE normally does its automagic here and creates all the function prototypes for you.
+  We have put functions in other files so we need to manually add some prototypes as the automagic doesn't work correctly
+********************************************************************************/
 void wifi_init_stat(void);
 bool wifi_handle_connection(void);
 
-/**************************************************************************************************/
 
 /* Globals */
 
@@ -148,46 +164,17 @@ char mywalletBalance[64 + 1];             //current balance
 uint64_t mywalletBalance_Uint64 = 0ULL;   //current balance
 
 
-/**************************************************************************************************/
 
 
-/* Main Function */
-
-void setup(void)
-{
-  // Enable Bot debug
-  Bot.set_debug(DEBUG_LEVEL_UTLGBOT);
-
-  // Initialize Serial
-  Serial.begin(115200);
-
-  // Initialize LED pin as digital output
-  digitalWrite(PIN_LED, LOW);
-  pinMode(PIN_LED, OUTPUT);
-  led_status = 0;
-
-  // Initialize WiFi station connection
-  wifi_init_stat();
-
-  // Wait for WiFi connection
-  Serial.println("Waiting for WiFi connection.");
-  while (!wifi_handle_connection())
-  {
-    Serial.print(".");
-    delay(500);
-  }
-
-  // Get Bot account info
-  Bot.getMe();
-  // Send a Telegram message for start
-  delay(100);
-  Bot.sendMessage(telegram_chat_id, TEXT_START);
 
 
-}
-
+/********************************************************************************
+  MAIN LOOP
+********************************************************************************/
 void loop()
 {
+
+  //--------------------------------------------
   // Check if WiFi is connected
   if (!wifi_handle_connection())
   {
@@ -196,172 +183,14 @@ void loop()
     return;
   }
 
-  // Check for Bot received messages
-  while (Bot.getUpdates())
-  {
-    // Show received message text
-    Serial.println("");
-    Serial.println("Received message:");
-    Serial.println(Bot.received_msg.text);
-    Serial.println("");
+  //--------------------------------------------
+  // Check for Telegram Bot received messages
+  if (millis() - previousUpdateTime_TelegramBot > UpdateInterval_TelegramBot)  {
+    previousUpdateTime_TelegramBot += UpdateInterval_TelegramBot;
 
-
-    //--------------------------------------------
-    // If /start command was received
-    if (strncmp(Bot.received_msg.text, "/start", strlen("/start")) == 0)
-    {
-      // Send a Telegram message for start
-      Bot.sendMessage(Bot.received_msg.chat.id, TEXT_START);
-    }
-
-
-    //--------------------------------------------
-    // If /help command was received
-    else if (strncmp(Bot.received_msg.text, "/help", strlen("/help")) == 0)
-    {
-      // Send a Telegram message for start
-      Bot.sendMessage(Bot.received_msg.chat.id, TEXT_HELP);
-    }
-
-
-    //--------------------------------------------
-    // If /ledon command was received
-    else if (strncmp(Bot.received_msg.text, "/ledon", strlen("/ledon")) == 0)
-    {
-      // Turn on LED
-      led_status = 1;
-      digitalWrite(PIN_LED, HIGH);
-
-      // Show command reception through Serial
-      Serial.println("Command /ledon received.");
-      Serial.println("Turning on the LED.");
-
-      // Send a Telegram message to notify that the LED has been turned on
-      Bot.sendMessage(Bot.received_msg.chat.id, "Led turned on.");
-    }
-
-
-    //--------------------------------------------
-    // If /ledoff command was received
-    else if (strncmp(Bot.received_msg.text, "/ledoff", strlen("/ledoff")) == 0)
-    {
-      // Turn off LED
-      led_status = 0;
-      digitalWrite(PIN_LED, LOW);
-
-      // Show command reception through Serial
-      Serial.println("Command /ledoff received.");
-      Serial.println("Turning off the LED.");
-
-      // Send a Telegram message to notify that the LED has been turned off
-      Bot.sendMessage(Bot.received_msg.chat.id, "Led turned off.");
-    }
-
-
-    //--------------------------------------------
-    // If /ledstatus command was received
-    else if (strncmp(Bot.received_msg.text, "/ledstatus", strlen("/ledstatus")) == 0)
-    {
-      // Send a Telegram message to notify actual LED status
-      if (led_status)
-        Bot.sendMessage(Bot.received_msg.chat.id, "The LED is on.");
-      else
-        Bot.sendMessage(Bot.received_msg.chat.id, "The LED is off.");
-    }
-
-
-    //--------------------------------------------
-    // If /address command was received
-    else if (strncmp(Bot.received_msg.text, "/address", strlen("/address")) == 0)
-    {
-      Bot.sendMessage(Bot.received_msg.chat.id, FaucetAddress);
-    }
-
-    //--------------------------------------------
-    // If /balance command was received
-    else if (strncmp(Bot.received_msg.text, "/balance", strlen("/balance")) == 0)
-    {
-      //--------------------------------------------
-      //  Retrieve Wallet Nonce and Balance
-      getWallet();
-      Bot.sendMessage(Bot.received_msg.chat.id, "faucet balance:");
-      Bot.sendMessage(Bot.received_msg.chat.id, bridgechainWallet.walletBalance);
-    }
-
-
-    //--------------------------------------------
-    // If /mybalance_ command was received
-    //--------------------------------------------
-    else if (strncmp(Bot.received_msg.text, "/mybalance_", strlen("/mybalance_")) == 0)
-    {
-      String mybalance = String(Bot.received_msg.text);
-      if (mybalance.charAt(11) == 'T')  {        //simple address verification
-        String mybalanceAddress = mybalance.substring(11, 11 + 34 + 1);       //Ark address is 34 digits long
-        Serial.print("\naddress: ");
-        Serial.print(mybalanceAddress);
-
-
-        //--------------------------------------------
-        mybalanceAddress.toCharArray(mybalanceAddress_char, 34 + 1);
-        Serial.print("\nreceiveAddress char: ");
-        Serial.print(mybalanceAddress_char);
-
-
-        //--------------------------------------------
-        // Retrieve Wallet Nonce from blockchain before sending transaction
-        getWallet_requested(mybalanceAddress_char);
-        Bot.sendMessage(Bot.received_msg.chat.id, "Your balance is:");
-        Bot.sendMessage(Bot.received_msg.chat.id, mywalletBalance);
-      }
-      else {
-        break;
-      }
-    }
-
-
-    //--------------------------------------------
-    // If /request_ command was received
-    else if (strncmp(Bot.received_msg.text, "/request_", strlen("/request_")) == 0)
-    {
-      String request = String(Bot.received_msg.text);
-      if (request.charAt(9) == 'T')  {        //simple address verification
-        String receiveaddress = request.substring(9, 9 + 34 + 1);       //Ark address is 34 digits long
-        Serial.print("\nreceiveAddress: ");
-        Serial.print(receiveaddress);
-
-        //--------------------------------------------
-        // Retrieve Wallet Nonce from blockchain before sending transaction
-        getWallet();
-
-        yield();
-
-        //--------------------------------------------
-        receiveaddress.toCharArray(receiveaddress_char, 34 + 1);
-        Serial.print("\nreceiveAddress char: ");
-        Serial.print(receiveaddress_char);
-
-        yield();
-
-        //--------------------------------------------
-        sendBridgechainTransaction();
-
-
-      }
-
-      else {
-        break;
-      }
-
-
-
-    }
-
-
-
-
-    // Feed the Watchdog
-    yield();
+    telegramBotHandler();
   }
+
 
   // Wait 1s for next iteration
   delay(1000);
@@ -369,8 +198,9 @@ void loop()
 
 /**************************************************************************************************/
 
-/* Functions */
-
+/********************************************************************************
+  WiFi Initialization Handler
+********************************************************************************/
 // Init WiFi interface
 void wifi_init_stat(void)
 {
@@ -384,10 +214,10 @@ void wifi_init_stat(void)
   Serial.println("TCP-IP adapter successfuly initialized.");
 }
 
-/**************************************************************************************************/
 
-/* WiFi Change Event Handler */
-
+/********************************************************************************
+  WiFi Connection Event Handler
+********************************************************************************/
 bool wifi_handle_connection(void)
 {
   static bool wifi_connected = false;
