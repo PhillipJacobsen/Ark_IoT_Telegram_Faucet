@@ -115,7 +115,7 @@ void sendBridgechainTransaction() {
 
   auto bridgechainTransaction = builder::Transfer(cfg)
                                 .recipientId(receiveaddress_char)       
-                                //.vendorField(tempVendorField)
+                                .vendorField(tempVendorField)
                                 .fee(1000000)
                                 .nonce(bridgechainWallet.walletNonce_Uint64)
                                 .amount(1000000000)
