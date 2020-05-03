@@ -53,6 +53,14 @@
 // Enable Bot debug level (0 - None; 1 - Bot Level; 2 - Bot+HTTPS Level)
 #define DEBUG_LEVEL_UTLGBOT 2
 #define UTLGBOT_MEMORY_LEVEL 4
+
+//-DUTLGBOT_MEMORY_LEVEL=0 // Max TLG msgs:  128 chars
+//-DUTLGBOT_MEMORY_LEVEL=1 // Max TLG msgs:  256 chars
+//-DUTLGBOT_MEMORY_LEVEL=2 // Max TLG msgs:  512 chars
+//-DUTLGBOT_MEMORY_LEVEL=3 // Max TLG msgs: 1024 chars
+//-DUTLGBOT_MEMORY_LEVEL=4 // Max TLG msgs: 2048 chars
+//-DUTLGBOT_MEMORY_LEVEL=5 // Max TLG msgs: 4097 chars (telegram max msg length)
+
 // Board Led Pin
 #define PIN_LED 13
 

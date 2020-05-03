@@ -85,7 +85,7 @@ void getWallet() {
   Serial.print("Get Wallet Response");
   Serial.println(walletGetResponse.c_str());                                    // The response is a 'std::string', to Print on Arduino, we need the c_string type.
   Serial.print("Nonce: ");
-  //Serial.println(bridgechainWallet.walletNonce);                              // serial.print does not have support for Uint64 
+  //Serial.println(bridgechainWallet.walletNonce);                              // serial.print does not have support for Uint64
   Serial.printf("%" PRIu64 "\n", bridgechainWallet.walletNonce_Uint64);         // PRIx64 to print in hexadecimal
   Serial.print("Balance: ");
   Serial.println(bridgechainWallet.walletBalance);
@@ -111,10 +111,10 @@ void sendBridgechainTransaction() {
 
   char tempVendorField[80];
   strcpy(tempVendorField, "Telegram Faucet");
-//  strcat(tempVendorField, scooterRental.sessionID_QRcode);
+  //  strcat(tempVendorField, scooterRental.sessionID_QRcode);
 
   auto bridgechainTransaction = builder::Transfer(cfg)
-                                .recipientId(receiveaddress_char)       
+                                .recipientId(receiveaddress_char)
                                 .vendorField(tempVendorField)
                                 .fee(1000000)
                                 .nonce(bridgechainWallet.walletNonce_Uint64)
@@ -132,4 +132,22 @@ void sendBridgechainTransaction() {
   std::string jsonStr = transactionsBuffer;
   std::string sendResponse = connection.api.transactions.send(jsonStr);
   Serial.println(sendResponse.c_str());
+
+  const size_t capacity = 2 * JSON_ARRAY_SIZE(0) + 2 * JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(4) + 190;
+  DynamicJsonDocument doc(capacity);
+  //const char* json = "{\"data\":{\"accept\":[\"bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2\"],\"broadcast\":[\"bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2\"],\"excess\":[],\"invalid\":[]}}";
+  deserializeJson(doc, sendResponse.c_str());
+  JsonObject data = doc["data"];
+  const char* data_accept_0 = data["accept"][0]; // "bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2"
+  const char* data_broadcast_0 = data["broadcast"][0]; // "bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2"
+
+  yield();
+  Bot.sendMessage(Bot.received_msg.chat.id, "TransactionID:");
+  //Bot.sendMessage(Bot.received_msg.chat.id, data_accept_0);
+
+  char explorerlink[100];
+  strcpy(explorerlink, "https://radians.nl/#/transaction/");
+  strcat(explorerlink, data_accept_0);
+  Bot.sendMessage(Bot.received_msg.chat.id, explorerlink);
+
 }
