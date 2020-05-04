@@ -6,17 +6,11 @@
     2020 @phillipjacobsen
 
     Program Features:
-    This program has been tested with ESP32 however it should also work with ESP8266 modules with minor changes to hardware connections and wifi libraries.
-    This sketch uses the ARK Cpp-Client API to interact with an Ark V2.6 Bridgechain Testnet/Devnet node.
+    This program implements a Telegram BOT running on an ESP32 microcontroller that can dispense Ark.io blockchain tokens upon request.
 
-    This program will provide similar features/settings as the ARK devnet faucet for DARK coins by deadlock-delegate
-    https://github.com/deadlock-delegate/faucet
-
-    faucetAddress - address of your faucet
-    vendorField - what message you wish to add to each payout
-    payoutAmount - what amount you wish to payout per request
-    payoutCooldown - for how long will user not be able to request a payment for
-    dailyPayoutLimit - what's the faucet's max (overall) daily payout
+    FaucetAddress - address of your Radians bridgechain token faucet
+    PAYOUT_MESSAGE - message you wish to add to each payout
+    PAYOUT_AMOUNT_UINT64 - amount that is sent per reuest
 ********************************************************************************/
 
 /********************************************************************************
