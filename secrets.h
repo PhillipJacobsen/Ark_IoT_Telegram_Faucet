@@ -37,7 +37,7 @@ static const auto PASSPHRASE  = "often power release space funny lend mango bloo
 //Configure the quantity of RAD sent per faucet request.  
 //const char* PAYOUT_AMOUNT = "100000000";                    
 constexpr uint64_t PAYOUT_AMOUNT_UINT64 = 100000000;     //default: 1000000000 = 10 RAD
-const char* PAYOUT_MESSAGE = "Telegram Faucet";     
+const char* PAYOUT_MESSAGE = "Telegram Faucet: Username ";     
 
 
 //Configure Bridgechain Relay

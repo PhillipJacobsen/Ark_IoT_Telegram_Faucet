@@ -126,13 +126,13 @@ void sendBridgechainTransaction() {
   // Use the Transaction Builder to make a transaction.
   bridgechainWallet.walletNonce_Uint64 = bridgechainWallet.walletNonce_Uint64 + 1;
 
-  char tempVendorField[80];
-  strcpy(tempVendorField, PAYOUT_MESSAGE);
-  //  strcat(tempVendorField, scooterRental.sessionID_QRcode);
+  char vendorField[255];
+  strcpy(vendorField, PAYOUT_MESSAGE);
+  strcat(vendorField, Bot.received_msg.from.first_name);
 
   auto bridgechainTransaction = builder::Transfer(cfg)
                                 .recipientId(receiveaddress_char)
-                                .vendorField(PAYOUT_MESSAGE)
+                                .vendorField(vendorField)
                                 .fee(1000000)
                                 .nonce(bridgechainWallet.walletNonce_Uint64)
                                 .amount(PAYOUT_AMOUNT_UINT64)
@@ -152,7 +152,6 @@ void sendBridgechainTransaction() {
 
   const size_t capacity = 2 * JSON_ARRAY_SIZE(0) + 2 * JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(4) + 190;
   DynamicJsonDocument doc(capacity);
-  //const char* json = "{\"data\":{\"accept\":[\"bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2\"],\"broadcast\":[\"bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2\"],\"excess\":[],\"invalid\":[]}}";
   deserializeJson(doc, sendResponse.c_str());
   JsonObject data = doc["data"];
   const char* data_accept_0 = data["accept"][0]; // "bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2"

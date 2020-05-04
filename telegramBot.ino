@@ -11,15 +11,17 @@ void telegramBotHandler() {
     //Serial.println(Bot.received_msg.text);
     //Serial.println("");
 
-
+    char TelegramMessage[100] = {0};
     //--------------------------------------------
     // If /start command was received
     if (strncmp(Bot.received_msg.text, "/start", strlen("/start")) == 0)
     {
 
       //Serial.printf("  From user name: %s %s\n", Bot.received_msg.from.first_name,Bot.received_msg.from.last_name);
-                
-                
+
+      //sprintf(TelegramMessage, "Welcome %02X%02X%02X%02X%02X%02X", "Welcome ", Bot.received_msg.from.first_name);  // Example: B4E62DA8EF6D
+      // http://www.cplusplus.com/reference/cstdio/printf/
+
       // Send a Telegram message for start
       Bot.sendMessage(Bot.received_msg.chat.id, TEXT_START);
     }
@@ -29,8 +31,9 @@ void telegramBotHandler() {
     // If /help command was received
     else if (strncmp(Bot.received_msg.text, "/help", strlen("/help")) == 0)
     {
-      Bot.sendMessage(Bot.received_msg.chat.id, TEXT_HELP);
-      // Send a Telegram message for help
+      strcpy(TelegramMessage, "Hello ");
+      strcat(TelegramMessage, Bot.received_msg.from.first_name);
+      Bot.sendMessage(Bot.received_msg.chat.id, TelegramMessage);
       Bot.sendMessage(Bot.received_msg.chat.id, TEXT_HELP);
     }
 
@@ -85,7 +88,9 @@ void telegramBotHandler() {
     // If /address command was received
     else if (strncmp(Bot.received_msg.text, "/address", strlen("/address")) == 0)
     {
-      Bot.sendMessage(Bot.received_msg.chat.id, FaucetAddress);
+      strcpy(TelegramMessage, "Faucet Address: ");
+      strcat(TelegramMessage, FaucetAddress);
+      Bot.sendMessage(Bot.received_msg.chat.id, TelegramMessage);
     }
 
     //--------------------------------------------
@@ -95,8 +100,9 @@ void telegramBotHandler() {
       //--------------------------------------------
       //  Retrieve Wallet Nonce and Balance
       getWallet();
-      Bot.sendMessage(Bot.received_msg.chat.id, "faucet balance:");
-      Bot.sendMessage(Bot.received_msg.chat.id, bridgechainWallet.walletBalance);
+      strcpy(TelegramMessage, "Faucet Balance: ");
+      strcat(TelegramMessage, bridgechainWallet.walletBalance);
+      Bot.sendMessage(Bot.received_msg.chat.id, TelegramMessage);
     }
 
 
@@ -106,23 +112,22 @@ void telegramBotHandler() {
     else if (strncmp(Bot.received_msg.text, "/mybalance_", strlen("/mybalance_")) == 0)
     {
       String mybalance = String(Bot.received_msg.text);
-      if (mybalance.charAt(11) == 'T')  {        //simple address verification
+      if (mybalance.charAt(11) == 'T')  {                                     //simple address verification
         String mybalanceAddress = mybalance.substring(11, 11 + 34 + 1);       //Ark address is 34 digits long
         Serial.print("\naddress: ");
         Serial.print(mybalanceAddress);
-
 
         //--------------------------------------------
         mybalanceAddress.toCharArray(mybalanceAddress_char, 34 + 1);
         Serial.print("\nreceiveAddress char: ");
         Serial.print(mybalanceAddress_char);
 
-
         //--------------------------------------------
         // Retrieve Wallet Nonce from blockchain before sending transaction
         getWallet_requested(mybalanceAddress_char);
-        Bot.sendMessage(Bot.received_msg.chat.id, "Your balance is:");
-        Bot.sendMessage(Bot.received_msg.chat.id, mywalletBalance);
+        strcpy(TelegramMessage, "Your Wallet Balance: ");
+        strcat(TelegramMessage, mywalletBalance);
+        Bot.sendMessage(Bot.received_msg.chat.id, TelegramMessage);
       }
       else {
         break;
@@ -151,12 +156,8 @@ void telegramBotHandler() {
         Serial.print("\nreceiveAddress char: ");
         Serial.print(receiveaddress_char);
 
-        yield();
-
         //--------------------------------------------
         sendBridgechainTransaction();
-
-
       }
 
       else {

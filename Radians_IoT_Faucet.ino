@@ -87,12 +87,11 @@ const char TEXT_START[] =
 // Telegram Bot /help text message
 const char TEXT_HELP[] =
   "Available Commands:\n"
-  "\n"
   "/start - Show start text.\n"
   "/help - Show actual text.\n"
-  "/ledon - Turn on the LED.\n"
-  "/ledoff - Turn off the LED.\n"
-  "/ledstatus - Show actual LED status.\n"
+//  "/ledon - Turn on the LED.\n"
+//  "/ledoff - Turn off the LED.\n"
+//  "/ledstatus - Show actual LED status.\n"
   "/address - Returns wallet address of faucet.\n"
   "/balance - Returns balance of faucet wallet.\n"
   "/request\\_WALLETADDRESS : replace WALLETADDRESS with your address.\n"
