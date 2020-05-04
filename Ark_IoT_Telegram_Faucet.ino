@@ -1,12 +1,13 @@
 /********************************************************************************
-    Radians Ark.io BridgeChain IoT Faucet
-    This projects runs on an ESP8266 or ESP32 microcontroller and provides a way to easily send Ark Bridgechain Cryptocurrency to a wallet address that is sent via Telegram app.
+    Ark.io BridgeChain IoT Telegram Faucet
+    This projects runs on an ESP32 microcontroller and provides a way to easily send Ark Bridgechain Cryptocurrency to a wallet address that is sent via Telegram app.
 
-    Radians_IoT_faucet.ino
+    ARk_IoT_Telegram_Faucet.ino
     2020 @phillipjacobsen
 
     Program Features:
     This program implements a Telegram BOT running on an ESP32 microcontroller that can dispense Ark.io custom blockchain tokens upon request.
+    Default settings are to operate with custom Radians blockchain
 
     FaucetAddress - address of your Radians bridgechain token faucet
     PAYOUT_MESSAGE - message you wish to add to each payout
