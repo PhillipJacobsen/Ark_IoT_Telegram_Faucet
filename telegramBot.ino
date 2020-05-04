@@ -37,7 +37,19 @@ void telegramBotHandler() {
       Bot.sendMessage(Bot.received_msg.chat.id, TEXT_HELP);
     }
 
+    //--------------------------------------------
+    // If /time command was received
+    else if (strncmp(Bot.received_msg.text, "/time", strlen("/time")) == 0)
+    {
 
+      time_t now = time(nullptr);   //  time_t is used to store the number of seconds since the epoch (normally 01/01/1970)
+      Bot.sendMessage(Bot.received_msg.chat.id, ctime(&now));
+      Serial.print("time is: ");
+      Serial.println(ctime(&now));    
+    }
+
+
+    
     //--------------------------------------------
     // If /ledon command was received
     else if (strncmp(Bot.received_msg.text, "/ledon", strlen("/ledon")) == 0)

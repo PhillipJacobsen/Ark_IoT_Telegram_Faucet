@@ -33,11 +33,6 @@ const int BAT_PIN = 35;     //ADC connected to Battery input pin (A13 = 35;)
 //const int DAC1 = 25;      //declared in \packages\esp32\hardware\esp32\1.0.4\variants\feather_esp32/pins_arduino.h
 //const int DAC2 = 26;
 
-// Standard C/C++ libraries
-//#include <string.h>
-
-// Device libraries (Arduino ESP32/ESP8266 Cores)
-//#include <Arduino.h>
 
 #ifdef ESP8266
 #include <ESP8266WiFi.h>
@@ -53,6 +48,9 @@ const int BAT_PIN = 35;     //ADC connected to Battery input pin (A13 = 35;)
 ********************************************************************************/
 #include <utlgbotlib.h>
 
+// Create Bot object
+uTLGBot Bot(TLG_TOKEN);
+
 /**************************************************************************************************/
 //WiFi Parameters required by Telegram Library
 #define MAX_CONN_FAIL 50
@@ -60,6 +58,23 @@ const int BAT_PIN = 35;     //ADC connected to Battery input pin (A13 = 35;)
 #define MAX_LENGTH_WIFI_PASS 63
 
 
+/*
+  after bot has been created use the following in BotFather to change the list of commands supported by your bot.
+  Users will see these commands as suggestions when they type / in the chat with your bot.
+
+  /setcommands
+  then enter commands like this. all in one chat. It seems you have to add all commands at once. I am not sure how to just add a new command to the list.
+start - Show startup message
+help - Show list of commands
+time - Show options keyboard
+name - Get Bot name
+time - Get current Time
+balance - Get balance of faucet wallet
+address - Get address of faucet
+
+request_walletaddress - Request tokens
+mybalance_walletaddress - get your balance
+*/
 
 /********************************************************************************
   Time Library
@@ -74,8 +89,9 @@ const int BAT_PIN = 35;     //ADC connected to Battery input pin (A13 = 35;)
 uint32_t UpdateInterval_TelegramBot = 1000;           // 1000ms
 uint32_t previousUpdateTime_TelegramBot = millis();
 
-// Telegram Bot /start text message
 
+
+  
 
 const char TEXT_START[] =
   "Radians.nl Ark BridgeChain IoT Faucet Ready.\n"
@@ -86,16 +102,20 @@ const char TEXT_START[] =
 
 // Telegram Bot /help text message
 const char TEXT_HELP[] =
+  "Ark.io BridgeChain Token Faucet Bot.\n"
+  "I am a Bot running in a microcontroller.\n"
+  "I can send you free tokens for the Radians.nl blockchain.\n\n"
   "Available Commands:\n"
-  "/start - Show start text.\n"
-  "/help - Show actual text.\n"
+// "/start - Show Bot startup message .\n"
+   "/help - Show available commands.\n"
+   "/time - Returns the time.\n"
 //  "/ledon - Turn on the LED.\n"
 //  "/ledoff - Turn off the LED.\n"
 //  "/ledstatus - Show actual LED status.\n"
   "/address - Returns wallet address of faucet.\n"
   "/balance - Returns balance of faucet wallet.\n"
-  "/request\\_WALLETADDRESS : replace WALLETADDRESS with your address.\n"
-  "/mybalance\\_MYBALANCE : replace MYBALANCE with your address.";
+  "/request\\_WALLETADDRESS : Sends RAD tokens to your address.\n    Replace WALLETADDRESS with your address.\n"
+  "/mybalance\\_MYBALANCE : Returns balance of your wallet.\n    Replace MYBALANCE with your address.";
 
 
 /********************************************************************************
@@ -107,15 +127,12 @@ void wifi_init_stat(void);
 bool wifi_handle_connection(void);
 
 
-/* Globals */
 
-// Create Bot object
-uTLGBot Bot(TLG_TOKEN);
+
 
 // LED status
 uint8_t led_status;
 
-/**************************************************************************************************/
 
 
 /**************************************************************************************************/
