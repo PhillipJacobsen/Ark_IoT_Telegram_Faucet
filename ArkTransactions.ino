@@ -130,6 +130,7 @@ void sendBridgechainTransaction() {
   strcpy(vendorField, PAYOUT_MESSAGE);
   strcat(vendorField, Bot.received_msg.from.first_name);
 
+
   auto bridgechainTransaction = builder::Transfer(cfg)
                                 .recipientId(receiveaddress_char)
                                 .vendorField(vendorField)
@@ -158,7 +159,7 @@ void sendBridgechainTransaction() {
   const char* data_broadcast_0 = data["broadcast"][0]; // "bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2"
 
   yield();
-  Bot.sendMessage(Bot.received_msg.chat.id, "Coins have been sent");
+  Bot.sendMessage(Bot.received_msg.chat.id, "Tokens have been sent");
 
   //Bot.sendMessage(Bot.received_msg.chat.id, "TransactionID:");
   //Bot.sendMessage(Bot.received_msg.chat.id, data_accept_0);

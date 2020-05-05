@@ -141,6 +141,7 @@ using namespace Ark::Crypto;
 using namespace Ark::Crypto::identities;
 using namespace Ark::Crypto::transactions;
 
+
 // BridgeChain Network Structure Model.
 // These are defined in secrets.h
 const Network BridgechainNetwork = {
