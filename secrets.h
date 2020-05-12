@@ -3,8 +3,8 @@
 #define WIFI_PASS         "6z5g4hbdxi"
 
 //w
-//#define WIFI_SSID         "TELUS6428"
-//#define WIFI_PASS         "3mmkgc9gn2"
+#define WIFI_SSID         "TELUS6428"
+#define WIFI_PASS         "3mmkgc9gn2"
 
 //configure Telegram
 // Telegram Bot Token (Get from Botfather)
@@ -31,12 +31,12 @@ int8_t TIME_ZONE = -7;        //set timezone:  MST (use this in winter)
 int16_t DST = 3600;           //To enable Daylight saving time set it to 3600. Otherwise, set it to 0. I am not sure if this actually works. Need to confirm in the fall...
 
 // Configure Radians Wallet for Faucet
-const char* FaucetAddress = "TCpoh6TYY8KZnwamGgmgTRcp5k9ycumH83";   //RADIANS testnet address that holds faucet funds
-static const auto PASSPHRASE  = "often power release space funny lend mango blood pet ribbon scene what";
+const char* FaucetAddress = "TQz8RicTCZdDVNg8AV289VAuL28FGezhxE";   //RADIANS testnet address that holds faucet funds
+static const auto PASSPHRASE  = "expire faint loop traffic stay aspect payment second snap first skull word";
 
 //Configure the quantity of RAD sent per faucet request.  
-//const char* PAYOUT_AMOUNT = "100000000";                    
-constexpr uint64_t PAYOUT_AMOUNT_UINT64 = 100000000;     //default: 1000000000 = 10 RAD
+//const char* PAYOUT_AMOUNT = "1000";                    
+constexpr uint64_t PAYOUT_AMOUNT_UINT64 = 1000;     //default: 1000000000 = 10 RAD
 const char* PAYOUT_MESSAGE = "Telegram Faucet: Username ";     
 
 
@@ -45,13 +45,13 @@ const char* ARK_PEER = "37.34.60.90";  //RADIANS Testnet Peer
 int ARK_PORT = 4040;
 
 // Configure Bridgechain Parameters
-static const auto BRIDGECHAIN_NETHASH   = "f39a61f04d6136a690a0b675ef6eedbd053665bd343b4e4f03311f12065fb875"; // std::string
+static const auto BRIDGECHAIN_NETHASH   = "314ccfc8c437e10cccb527ee6726be606da8fbaebe54c5c105df30882511c25a"; // std::string
 static const auto BRIDGECHAIN_SLIP44    = 1;          // uint8_t
-static const auto BRIDGECHAIN_WIF       = 0xCE;       // uint8_t
-static const auto BRIDGECHAIN_VERSION   = 0x41;       // uint8_t
-static const auto BRIDGECHAIN_EPOCH     = "2019-10-25T09:05:40.856Z";  // std::string
-constexpr uint64_t TYPE_0_FEE           = 1000000ULL;   //0.01RAD
-constexpr uint8_t TYPE_0_TYPE           = 0U;
+static const auto BRIDGECHAIN_WIF       = 0x91;       // uint8_t      145
+static const auto BRIDGECHAIN_VERSION   = 0x41;       // uint8_t      65
+static const auto BRIDGECHAIN_EPOCH     = "2020-05-12T11:34:19.156Z";  // std::string
+//constexpr uint64_t TYPE_0_FEE           = 1000000ULL;   //0.01RAD
+//constexpr uint8_t TYPE_0_TYPE           = 0U;
 
 
 

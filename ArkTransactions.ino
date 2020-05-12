@@ -134,7 +134,7 @@ void sendBridgechainTransaction() {
   auto bridgechainTransaction = builder::Transfer(cfg)
                                 .recipientId(receiveaddress_char)
                                 .vendorField(vendorField)
-                                .fee(1000000)
+                                .fee(1)
                                 .nonce(bridgechainWallet.walletNonce_Uint64)
                                 .amount(PAYOUT_AMOUNT_UINT64)
                                 .sign(PASSPHRASE)
@@ -156,7 +156,14 @@ void sendBridgechainTransaction() {
   deserializeJson(doc, sendResponse.c_str());
   JsonObject data = doc["data"];
   const char* data_accept_0 = data["accept"][0]; // "bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2"
-  const char* data_broadcast_0 = data["broadcast"][0]; // "bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2"
+  //  const char* data_broadcast_0 = data["broadcast"][0]; // "bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2"
+
+  //need to add more error handling here!
+  if ((data_accept_0 != NULL) && (data_accept_0[0] == '\0')) {
+    Serial.println("error sending transaction");
+    return;
+  }
+
 
   yield();
   Bot.sendMessage(Bot.received_msg.chat.id, "Tokens have been sent");
@@ -166,7 +173,7 @@ void sendBridgechainTransaction() {
 
   char explorerlink[150];
   strcpy(explorerlink, "TransactionID:  ");
-  strcat(explorerlink, "https://radians.nl/#/transaction/");
+  strcat(explorerlink, "https://radians.nl/transaction/");
   strcat(explorerlink, data_accept_0);
   Bot.sendMessage(Bot.received_msg.chat.id, explorerlink);
 
