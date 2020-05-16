@@ -1,10 +1,10 @@
 //h
-#define WIFI_SSID         "TELUS0183"
-#define WIFI_PASS         "6z5g4hbdxi"
+#define WIFI_SSID         "TELUS0357"
+#define WIFI_PASS         "77kmm7r7hz"
 
 //w
-#define WIFI_SSID         "TELUS6428"
-#define WIFI_PASS         "3mmkgc9gn2"
+//#define WIFI_SSID         "TELUS6428"
+//#define WIFI_PASS         "3mmkgc9gn2"
 
 //configure Telegram
 // Telegram Bot Token (Get from Botfather)
@@ -41,7 +41,9 @@ const char* PAYOUT_MESSAGE = "Telegram Faucet: Username ";
 
 
 //Configure Bridgechain Relay
-const char* ARK_PEER = "37.34.60.90";  //RADIANS Testnet Peer
+//const char* ARK_PEER = "37.34.60.90";  //RADIANS Testnet Peer
+const char* ARK_PEER = "138.197.165.189";  //RADIANS Testnet Peer - PJ's
+
 int ARK_PORT = 4040;
 
 // Configure Bridgechain Parameters
