@@ -22,8 +22,8 @@ void setup()
 
   // Optional Features of EspMQTTClient
   WiFiMQTTclient.enableDebuggingMessages(); // Enable debugging messages sent to serial output
-//  WiFiMQTTclient.enableHTTPWebUpdater(); // Enable the web updater. User and password default to values of MQTTUsername and MQTTPassword. These can be overwritten with enableHTTPWebUpdater("user", "password").
-  WiFiMQTTclient.enableLastWillMessage("IoT/lastwill", "Goodbye");  // You can activate the retain flag by setting the third parameter to true
+  //  WiFiMQTTclient.enableHTTPWebUpdater(); // Enable the web updater. User and password default to values of MQTTUsername and MQTTPassword. These can be overwritten with enableHTTPWebUpdater("user", "password").
+  WiFiMQTTclient.enableLastWillMessage("radians_faucet/status", "false");  // You can activate the retain flag by setting the third parameter to true
   WiFiMQTTclient.enableMQTTConnect();
   WiFiMQTTclient.enableMACaddress_for_ClientName();
 
@@ -32,12 +32,18 @@ void setup()
 
 
 /********************************************************************************
-  
+
 ********************************************************************************/
 // Handler for receiving MQTT message
-void set2Handler (const String & payload) {
-  Serial.print("received MQTT topic IOT/set2: ");
+void MQTT_Request_Handler (const String & payload) {
+  Serial.print("received MQTT topic radians_faucet/request: ");
   Serial.println(payload);
+
+  String  buf;    //NOTE!  I think sprintf() is better to use here. update when you have a chance
+  buf += F("received request: ");
+  buf += String(payload);
+  WiFiMQTTclient.publish("radians_faucet/response", buf);
+
 }
 
 
@@ -60,27 +66,31 @@ void onConnectionEstablished() {
     Serial.println("\nIP address: ");
     Serial.println(WiFi.localIP());
 
-    // Subscribe to "IOT/set" and display received message to Serial
-    WiFiMQTTclient.subscribe("IOT/set", [](const String & payload) {
-      Serial.print("received MQTT topic IOT/set: ");
-      Serial.println(payload);
-    });
+    //    // Subscribe to "IOT/set" and display received message to Serial
+    //    WiFiMQTTclient.subscribe("IOT/set", [](const String & payload) {
+    //      Serial.print("received MQTT topic IOT/set: ");
+    //      Serial.println(payload);
+    //    });
 
 
-    // Subscribe to "IOT/#" and display received message to Serial
-    WiFiMQTTclient.subscribe("IOT/#", [](const String & topic, const String & payload) {
-      Serial.print("received MQTT via wildcard: ");
-      Serial.println(topic + ": " + payload);
-    });
+    //    // Subscribe to "IOT/#" and display received message to Serial
+    //    WiFiMQTTclient.subscribe("radians_faucet/request", [](const String & topic, const String & payload) {
+    //      Serial.print("received MQTT via wildcard: ");
+    //      Serial.println(topic + ": " + payload);
+    //    });
 
-    // Subscribe to "IOT/set2" via alternate callback format
-    WiFiMQTTclient.subscribe("IOT/set2", set2Handler);
+    // Subscribe to "radians_faucet/request" via alternate callback format
+    WiFiMQTTclient.subscribe("radians_faucet/request", MQTT_Request_Handler);
+
+    WiFiMQTTclient.publish("radians_faucet/status", "true");
 
     Serial.println("");
     Serial.println(WiFiMQTTclient.getMqttClientName());
     Serial.println(WiFiMQTTclient.getMqttServerIp());
     Serial.println(WiFiMQTTclient.getMqttServerPort());
     Serial.println(WiFiMQTTclient.getConnectionEstablishedCount());
+
+
 
 
 
@@ -110,23 +120,30 @@ void onConnectionEstablished() {
     Serial.println(formattedTime);
 
 
-  //--------------------------------------------
-  // Get Telegram Bot account info
-  Bot.getMe();
+    //--------------------------------------------
+    // Get Telegram Bot account info
+    Bot.getMe();
 
-  //--------------------------------------------
-  // Set Telegram Bot /Start message
+    //--------------------------------------------
+    // Set Telegram Bot /Start message
 
-  // Send a Telegram message for start
-  delay(100);
-  Bot.sendMessage(telegram_chat_id, TEXT_START);
+    // Send a Telegram message for start
+    delay(100);
+    Bot.sendMessage(telegram_chat_id, TEXT_START);
 
 
 
-    
+
   }
 
   else {
+
+    // Subscribe to "radians_faucet/request" via alternate callback format
+    WiFiMQTTclient.subscribe("radians_faucet/request", MQTT_Request_Handler);
+
+    WiFiMQTTclient.publish("radians_faucet/status", "true");
+
+
 
   }
 

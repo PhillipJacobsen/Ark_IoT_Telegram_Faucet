@@ -51,6 +51,9 @@ uTLGBot Bot(TLG_TOKEN);
 #define MAX_LENGTH_WIFI_SSID 31
 #define MAX_LENGTH_WIFI_PASS 63
 
+//Changed this in utlgbotlib.h
+// Telegram getUpdate Long Poll value (s)
+//#define TELEGRAM_LONG_POLL 5      //default is 10
 
 /*
   after bot has been created use the following in BotFather to change the list of commands supported by your bot.
@@ -80,7 +83,7 @@ uTLGBot Bot(TLG_TOKEN);
 /********************************************************************************
   Update Intervals for various algorithms
 ********************************************************************************/
-uint32_t UpdateInterval_TelegramBot = 1000;           // 1000ms
+uint32_t UpdateInterval_TelegramBot = 2500;           // 2500ms
 uint32_t previousUpdateTime_TelegramBot = millis();
 
 /********************************************************************************
@@ -133,7 +136,12 @@ EspMQTTClient WiFiMQTTclient(
 enum State_enum {STATE_0, STATE_1, STATE_2, STATE_3, STATE_4, STATE_5, STATE_6};    //The possible states of the state machine
 State_enum state = STATE_0;     //initialize the starting state.
 
-
+/********************************************************************************
+  Update Intervals for various algorithms
+********************************************************************************/
+//Frequency at which the MQTT packets are published
+uint32_t UpdateInterval_MQTT_Publish = 10000;           // 10 seconds
+uint32_t previousUpdateTime_MQTT_Publish = millis();
 
 
 const char TEXT_START[] =
