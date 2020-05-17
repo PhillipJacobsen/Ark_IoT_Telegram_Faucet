@@ -39,10 +39,38 @@ void MQTT_Request_Handler (const String & payload) {
   Serial.print("received MQTT topic radians_faucet/request: ");
   Serial.println(payload);
 
-  String  buf;    //NOTE!  I think sprintf() is better to use here. update when you have a chance
-  buf += F("received request: ");
-  buf += String(payload);
-  WiFiMQTTclient.publish("radians_faucet/response", buf);
+
+  String request = String(payload);
+
+  String receiveaddress = request;
+  Serial.print("\nreceiveAddress: ");
+  Serial.print(receiveaddress);
+  receiveaddress.toCharArray(receiveaddress_char, 34 + 1);
+
+  if (Address::validate( Address(receiveaddress_char), BRIDGECHAIN_VERSION)) {
+    Serial.println("Address Validated");
+  }
+  else {
+    Serial.println("not a valid address");
+    String  buf;    //NOTE!  I think sprintf() is better to use here. update when you have a chance
+    buf += F("received invalid address: ");
+    buf += String(payload);
+    WiFiMQTTclient.publish("radians_faucet/response", buf);
+
+    return;
+    //break;
+  }
+
+  //--------------------------------------------
+  // Retrieve Wallet Nonce from blockchain before sending transaction
+  getWallet();
+  //--------------------------------------------
+
+  Serial.print("\nreceiveAddress char: ");
+  Serial.print(receiveaddress_char);
+
+  //--------------------------------------------
+  sendBridgechainTransaction_MQTTrequest();
 
 }
 

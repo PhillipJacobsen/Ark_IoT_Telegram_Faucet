@@ -46,7 +46,7 @@ static const auto PASSPHRASE  = "expire faint loop traffic stay aspect payment s
 //const char* PAYOUT_AMOUNT = "1000";                    
 constexpr uint64_t PAYOUT_AMOUNT_UINT64 = 1000;     //default: 1000000000 = 10 RAD
 const char* PAYOUT_MESSAGE = "Telegram Faucet: Username ";     
-
+const char* PAYOUT_MESSAGE_MQTT = "MQTT Faucet";   
 
 //Configure Bridgechain Relay
 //const char* ARK_PEER = "37.34.60.90";  //RADIANS Testnet Peer
