@@ -168,11 +168,7 @@ void onConnectionEstablished() {
 
     // Subscribe to "radians_faucet/request" via alternate callback format
     WiFiMQTTclient.subscribe("radians_faucet/request", MQTT_Request_Handler);
-
-    WiFiMQTTclient.publish("radians_faucet/status", "true");
-
-
-
+    WiFiMQTTclient.publish("radians_faucet/status", "true",true);  //set retain = true
   }
 
 }

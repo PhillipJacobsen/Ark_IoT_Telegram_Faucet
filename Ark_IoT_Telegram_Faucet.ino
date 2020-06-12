@@ -83,7 +83,7 @@ uTLGBot Bot(TLG_TOKEN);
 /********************************************************************************
   Update Intervals for various algorithms
 ********************************************************************************/
-uint32_t UpdateInterval_TelegramBot = 2500;           // 2500ms
+uint32_t UpdateInterval_TelegramBot = 3000;           // 3000ms
 uint32_t previousUpdateTime_TelegramBot = millis();
 
 /********************************************************************************
@@ -174,10 +174,6 @@ const char TEXT_HELP[] =
   Arduino IDE normally does its automagic here and creates all the function prototypes for you.
   We have put functions in other files so we need to manually add some prototypes as the automagic doesn't work correctly
 ********************************************************************************/
-void wifi_init_stat(void);
-bool wifi_handle_connection(void);
-
-
 
 
 

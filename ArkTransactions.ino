@@ -171,7 +171,7 @@ void sendBridgechainTransaction() {
 
   char explorerlink[150];
   strcpy(explorerlink, "TransactionID:  ");
-  strcat(explorerlink, "https://radians.nl/transaction/");
+  strcat(explorerlink, "https://explorer.radians.nl/transaction/");
   strcat(explorerlink, data_accept_0);
   Bot.sendMessage(Bot.received_msg.chat.id, explorerlink);
 
@@ -238,7 +238,7 @@ void sendBridgechainTransaction_MQTTrequest() {
 
   char explorerlink[150];
   strcpy(explorerlink, "TransactionID:  ");
-  strcat(explorerlink, "https://radians.nl/transaction/");
+  strcat(explorerlink, "https://explorer.radians.nl/transaction/");
   strcat(explorerlink, data_accept_0);
   // Bot.sendMessage(Bot.received_msg.chat.id, explorerlink);
   // Serial.println("not a valid address");
