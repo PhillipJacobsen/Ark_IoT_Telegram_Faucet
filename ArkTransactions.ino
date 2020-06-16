@@ -120,8 +120,6 @@ void getWallet_requested(char * mybalanceAddress_char) {
   NOTE: This project does not send any standard transactions so the following is not used.
 
 ********************************************************************************/
-
-
 void sendBridgechainTransaction() {
   // Use the Transaction Builder to make a transaction.
   bridgechainWallet.walletNonce_Uint64 = bridgechainWallet.walletNonce_Uint64 + 1;
@@ -173,8 +171,80 @@ void sendBridgechainTransaction() {
 
   char explorerlink[150];
   strcpy(explorerlink, "TransactionID:  ");
-  strcat(explorerlink, "https://radians.nl/transaction/");
+  strcat(explorerlink, "https://explorer.radians.nl/transaction/");
   strcat(explorerlink, data_accept_0);
   Bot.sendMessage(Bot.received_msg.chat.id, explorerlink);
+
+}
+
+
+
+
+
+
+/********************************************************************************
+  Send a standard BridgeChain transaction, tailored for a custom network.
+
+********************************************************************************/
+void sendBridgechainTransaction_MQTTrequest() {
+  // Use the Transaction Builder to make a transaction.
+  bridgechainWallet.walletNonce_Uint64 = bridgechainWallet.walletNonce_Uint64 + 1;
+
+  char vendorField[255];
+  strcpy(vendorField, PAYOUT_MESSAGE_MQTT);
+  //  strcat(vendorField, Bot.received_msg.from.first_name);
+
+
+  auto bridgechainTransaction = builder::Transfer(cfg)
+                                .recipientId(receiveaddress_char)
+                                .vendorField(vendorField)
+                                .fee(1)
+                                .nonce(bridgechainWallet.walletNonce_Uint64)
+                                .amount(PAYOUT_AMOUNT_UINT64)
+                                .sign(PASSPHRASE)
+                                .build();
+
+  const auto transactionJson = bridgechainTransaction.toJson();
+  printf("\n\nBridgechain Transaction: %s\n\n", transactionJson.c_str());
+
+  bridgechainTransaction.sign(PASSPHRASE);
+
+  char transactionsBuffer[1500];
+  snprintf(&transactionsBuffer[0], 1500, "{\"transactions\":[%s]}", bridgechainTransaction.toJson().c_str());
+  std::string jsonStr = transactionsBuffer;
+  std::string sendResponse = connection.api.transactions.send(jsonStr);
+  Serial.println(sendResponse.c_str());
+
+  const size_t capacity = 2 * JSON_ARRAY_SIZE(0) + 2 * JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(4) + 190;
+  DynamicJsonDocument doc(capacity);
+  deserializeJson(doc, sendResponse.c_str());
+  JsonObject data = doc["data"];
+  const char* data_accept_0 = data["accept"][0]; // "bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2"
+  //  const char* data_broadcast_0 = data["broadcast"][0]; // "bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2"
+
+  //need to add more error handling here!
+  if ((data_accept_0 != NULL) && (data_accept_0[0] == '\0')) {
+    Serial.println("error sending transaction");
+    return;
+  }
+
+
+  //  yield();
+  //  Bot.sendMessage(Bot.received_msg.chat.id, "Tokens have been sent");
+
+  //use this to send the transaction response
+  //Bot.sendMessage(Bot.received_msg.chat.id, "TransactionID:");
+  //Bot.sendMessage(Bot.received_msg.chat.id, data_accept_0);
+
+  char explorerlink[150];
+  strcpy(explorerlink, "TransactionID:  ");
+  strcat(explorerlink, "https://explorer.radians.nl/transaction/");
+  strcat(explorerlink, data_accept_0);
+  // Bot.sendMessage(Bot.received_msg.chat.id, explorerlink);
+  // Serial.println("not a valid address");
+ // String  buf;    //NOTE!  I think sprintf() is better to use here. update when you have a chance
+ // buf += F("TransactionID: ");
+ // buf += String(explorerlink);
+  WiFiMQTTclient.publish("radians_faucet/response", explorerlink);
 
 }

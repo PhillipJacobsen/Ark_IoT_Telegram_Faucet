@@ -1,3 +1,11 @@
+
+#define MQTT_SERVER_IP    "40.85.223.207"
+#define MQTT_USERNAME     "MQTTFaucet"
+#define MQTT_PASSWORD     "MagpieCrow77"
+//#define MQTT_CLIENT_NAME  "TestClient"
+char* MQTT_CLIENT_NAME =  "TestClient";
+#define MQTT_SERVER_PORT  1883
+
 //h
 #define WIFI_SSID         "TELUS0357"
 #define WIFI_PASS         "77kmm7r7hz"
@@ -36,9 +44,9 @@ static const auto PASSPHRASE  = "expire faint loop traffic stay aspect payment s
 
 //Configure the quantity of RAD sent per faucet request.  
 //const char* PAYOUT_AMOUNT = "1000";                    
-constexpr uint64_t PAYOUT_AMOUNT_UINT64 = 1000;     //default: 1000000000 = 10 RAD
+constexpr uint64_t PAYOUT_AMOUNT_UINT64 = 1000;    
 const char* PAYOUT_MESSAGE = "Telegram Faucet: Username ";     
-
+const char* PAYOUT_MESSAGE_MQTT = "MQTT Faucet";   
 
 //Configure Bridgechain Relay
 //const char* ARK_PEER = "37.34.60.90";  //RADIANS Testnet Peer
@@ -52,14 +60,3 @@ static const auto BRIDGECHAIN_SLIP44    = 1;          // uint8_t
 static const auto BRIDGECHAIN_WIF       = 0x91;       // uint8_t      145
 static const auto BRIDGECHAIN_VERSION   = 0x41;       // uint8_t      65
 static const auto BRIDGECHAIN_EPOCH     = "2020-05-12T11:34:19.156Z";  // std::string
-//constexpr uint64_t TYPE_0_FEE           = 1000000ULL;   //0.01RAD
-//constexpr uint8_t TYPE_0_TYPE           = 0U;
-
-
-
-//--------------------------------------------
-// If you are reprogramming a new wallet address into an existing ESP32 module you need to erase the Flash which stores the number of received transactions in the wallet.
-// 1. Define ERASE_FLASH below
-// 2. Download firmware
-// 3. undefine ERASE_FLASH and reprogram
-//#define ERASE_FLASH

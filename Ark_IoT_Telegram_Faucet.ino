@@ -29,17 +29,16 @@ const int BAT_PIN = 35;     //ADC connected to Battery input pin (A13 = 35;)
 //const int DAC2 = 26;
 
 
-#ifdef ESP8266
-#include <ESP8266WiFi.h>
-#else
-#include <WiFi.h>
-#endif
+/********************************************************************************
+                              Various Global Variables
+********************************************************************************/
+bool initialConnectionEstablished_Flag = false;   //used to detect first run after power up
 
 
 /********************************************************************************
     utlgbotlib Telegram bot Library by JRios Version 1.0.0
     https://github.com/J-Rios/uTLGBotLib-arduino
-    
+
 ********************************************************************************/
 #include <utlgbotlib.h>
 
@@ -52,6 +51,9 @@ uTLGBot Bot(TLG_TOKEN);
 #define MAX_LENGTH_WIFI_SSID 31
 #define MAX_LENGTH_WIFI_PASS 63
 
+//Changed this in utlgbotlib.h
+// Telegram getUpdate Long Poll value (s)
+//#define TELEGRAM_LONG_POLL 5      //default is 10
 
 /*
   after bot has been created use the following in BotFather to change the list of commands supported by your bot.
@@ -59,16 +61,16 @@ uTLGBot Bot(TLG_TOKEN);
 
   /setcommands
   then enter commands like this. all in one chat. It seems you have to add all commands at once. I am not sure how to just add a new command to the list.
-start - Show startup message
-help - Show list of commands
-time - Show options keyboard
-name - Get Bot name
-time - Get current Time
-balance - Get balance of faucet wallet
-address - Get address of faucet
+  start - Show startup message
+  help - Show list of commands
+  time - Show options keyboard
+  name - Get Bot name
+  time - Get current Time
+  balance - Get balance of faucet wallet
+  address - Get address of faucet
 
-request_walletaddress - Request tokens
-mybalance_walletaddress - get your balance
+  request_walletaddress - Request tokens
+  mybalance_walletaddress - get your balance
 */
 
 /********************************************************************************
@@ -81,12 +83,66 @@ mybalance_walletaddress - get your balance
 /********************************************************************************
   Update Intervals for various algorithms
 ********************************************************************************/
-uint32_t UpdateInterval_TelegramBot = 1000;           // 1000ms
+uint32_t UpdateInterval_TelegramBot = 3000;           // 3000ms
 uint32_t previousUpdateTime_TelegramBot = millis();
 
+/********************************************************************************
+   Arduino Json Libary - Tested with version 6.13
+
+********************************************************************************/
+//#include <ArduinoJson.h>
 
 
-  
+/********************************************************************************
+  Library for reading/writing to the ESP32 flash memory.
+  ESP32 Arduino libraries emulate EEPROM using a sector (4 kilobytes) of flash memory.
+  The total flash memory size is ???
+  The entire space is split between bootloader, application, OTA data, NVS, SPIFFS, and EEPROM.
+  EEPROM library on the ESP32 allows using at most 1 sector (4kB) of flash.
+********************************************************************************/
+#include <EEPROM.h>
+
+/********************************************************************************
+    EspMQTTClient Library by @plapointe6 Version 1.8.0
+    WiFi and MQTT connection handler for ESP32
+    This library does a nice job of encapsulating the handling of WiFi and MQTT connections.
+    https://github.com/plapointe6/EspMQTTClient
+    You just need to provide your credentials and it will manage the connection and reconnections to the Wifi and MQTT networks.
+    EspMQTTClient is a wrapper around the MQTT PubSubClient Library Version 2.7 by @knolleary
+********************************************************************************/
+// The MQTT packets are larger then the allowed for the default setting of the libary.
+// You need to update this line in PubSubClient.h. Setting it here does nothing.
+// If you update this library you will need to update this setting as it will be overwritten.
+// #define MQTT_MAX_PACKET_SIZE 512  // the maximum message size, including header, is 128 bytes by default. Configurable in \Arduino\libraries\PubSubClient\src\PubSubClient.h.
+
+#include "EspMQTTClient.h"
+
+
+EspMQTTClient WiFiMQTTclient(
+  WIFI_SSID,
+  WIFI_PASS,
+  MQTT_SERVER_IP,   // MQTT Broker server ip
+  MQTT_USERNAME,    // Can be omitted if not needed
+  MQTT_PASSWORD,    // Can be omitted if not needed
+  MQTT_CLIENT_NAME, // Client name that uniquely identify your device
+  MQTT_SERVER_PORT  // The MQTT port, default to 1883. this line can be omitted
+);
+
+
+
+/********************************************************************************
+  State Machine
+********************************************************************************/
+enum State_enum {STATE_0, STATE_1, STATE_2, STATE_3, STATE_4, STATE_5, STATE_6};    //The possible states of the state machine
+State_enum state = STATE_0;     //initialize the starting state.
+
+/********************************************************************************
+  Update Intervals for various algorithms
+********************************************************************************/
+//Frequency at which the MQTT packets are published
+uint32_t UpdateInterval_MQTT_Publish = 10000;           // 10 seconds
+uint32_t previousUpdateTime_MQTT_Publish = millis();
+
 
 const char TEXT_START[] =
   "Radians.nl Ark BridgeChain IoT Faucet Ready.\n"
@@ -101,12 +157,12 @@ const char TEXT_HELP[] =
   "I am a Bot running in a microcontroller.\n"
   "I can send you free tokens for the Radians.nl blockchain.\n\n"
   "Available Commands:\n"
-// "/start - Show Bot startup message .\n"
-   "/help - Show available commands.\n"
-   "/time - Returns the time.\n"
-//  "/ledon - Turn on the LED.\n"
-//  "/ledoff - Turn off the LED.\n"
-//  "/ledstatus - Show actual LED status.\n"
+  // "/start - Show Bot startup message .\n"
+  "/help - Show available commands.\n"
+  "/time - Returns the time.\n"
+  //  "/ledon - Turn on the LED.\n"
+  //  "/ledoff - Turn off the LED.\n"
+  //  "/ledstatus - Show actual LED status.\n"
   "/address - Returns wallet address of faucet.\n"
   "/balance - Returns balance of faucet wallet.\n"
   "/request\\_WALLETADDRESS : Sends RAD tokens to your address.\n    Replace WALLETADDRESS with your address.\n"
@@ -118,10 +174,6 @@ const char TEXT_HELP[] =
   Arduino IDE normally does its automagic here and creates all the function prototypes for you.
   We have put functions in other files so we need to manually add some prototypes as the automagic doesn't work correctly
 ********************************************************************************/
-void wifi_init_stat(void);
-bool wifi_handle_connection(void);
-
-
 
 
 
@@ -182,30 +234,40 @@ char mywalletBalance[64 + 1];             //current balance
 uint64_t mywalletBalance_Uint64 = 0ULL;   //current balance
 
 
-
-
+/********************************************************************************
+  Function prototypes
+  Arduino IDE normally does its automagic here and creates all the function prototypes for you.
+  We have put functions in other files so we need to manually add some prototypes as the automagic doesn't work correctly
+********************************************************************************/
+void StateMachine();
+//void send_MQTTpacket();
 
 
 /********************************************************************************
   MAIN LOOP
 ********************************************************************************/
-void loop()
-{
+void loop() {
+
   //--------------------------------------------
-  // Check if WiFi is connected
-  if (!wifi_handle_connection())
-  {
-    // Wait 100ms and check again
-    delay(100);
-    return;
-  }
+  // Process state machine
+  StateMachine();
+
+  //--------------------------------------------
+  // Handle the WiFi and MQTT connections
+  WiFiMQTTclient.loop();
+
+  //--------------------------------------------
+  // Publish MQTT data every UpdateInterval_MQTT_Publish (10 seconds)
+  //  send_MQTTpacket();
+
 
   //--------------------------------------------
   // Check for Telegram Bot received messages
   if (millis() - previousUpdateTime_TelegramBot > UpdateInterval_TelegramBot)  {
     previousUpdateTime_TelegramBot += UpdateInterval_TelegramBot;
-
     telegramBotHandler();
   }
+
+
 
 }

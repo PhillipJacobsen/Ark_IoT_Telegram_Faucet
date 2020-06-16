@@ -189,9 +189,6 @@ void telegramBotHandler() {
         Serial.print("\nreceiveAddress char: ");
         Serial.print(receiveaddress_char);
 
-
-
-
         //--------------------------------------------
         sendBridgechainTransaction();
       }
