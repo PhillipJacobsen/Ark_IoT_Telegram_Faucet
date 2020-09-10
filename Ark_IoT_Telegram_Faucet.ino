@@ -1,6 +1,7 @@
 /********************************************************************************
-    Ark.io BridgeChain IoT Telegram Faucet
-    This projects runs on an ESP32 microcontroller and provides a way to easily send Ark Bridgechain Cryptocurrency to a wallet address that is sent via Telegram app.
+    Ark.io BridgeChain IoT Telegram and MQTT Faucet
+    This projects runs on an ESP32 microcontroller and provides a way to easily send Ark Bridgechain Cryptocurrency to a wallet address that is sent via Telegram app
+    or via MQTT.
 
     ARk_IoT_Telegram_Faucet.ino
     2020 @phillipjacobsen
@@ -23,10 +24,9 @@
 /********************************************************************************
                             Misc I/O Definitions
 ********************************************************************************/
-const int LED_PIN = 13;     //LED integrated on Adafruit HUZZAH32 module
+//const int LED_PIN = 13;     //LED integrated on Adafruit HUZZAH32 module
+const int LED_PIN = 25;     //LED integrated on Heltec WiFi Kit
 const int BAT_PIN = 35;     //ADC connected to Battery input pin (A13 = 35;)
-//const int DAC1 = 25;      //declared in \packages\esp32\hardware\esp32\1.0.4\variants\feather_esp32/pins_arduino.h
-//const int DAC2 = 26;
 
 
 /********************************************************************************
@@ -83,7 +83,7 @@ uTLGBot Bot(TLG_TOKEN);
 /********************************************************************************
   Update Intervals for various algorithms
 ********************************************************************************/
-uint32_t UpdateInterval_TelegramBot = 3000;           // 3000ms
+uint32_t UpdateInterval_TelegramBot = 5100;           
 uint32_t previousUpdateTime_TelegramBot = millis();
 
 /********************************************************************************
@@ -143,7 +143,7 @@ State_enum state = STATE_0;     //initialize the starting state.
 uint32_t UpdateInterval_MQTT_Publish = 10000;           // 10 seconds
 uint32_t previousUpdateTime_MQTT_Publish = millis();
 
-
+// Telegram Bot /start text message
 const char TEXT_START[] =
   "Radians.nl Ark BridgeChain IoT Faucet Ready.\n"
   "I am a Bot running in an ESP microcontroller.\n"
