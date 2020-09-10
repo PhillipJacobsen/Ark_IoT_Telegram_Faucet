@@ -1,10 +1,16 @@
 void telegramBotHandler() {
-
+    u8g2.clearBuffer();
+    u8g2.sendBuffer();
+    
   while (Bot.getUpdates())
   {
 
 
     telegram_PrintMsgDetails();
+    u8g2.setFont(u8g2_font_unifont_t_symbols);
+    u8g2.drawUTF8(0, 0, "New Telegram Msg");
+    u8g2.sendBuffer();
+
     // Show received message text
     //Serial.println("");
     //Serial.println("Received message:");
@@ -16,6 +22,9 @@ void telegramBotHandler() {
     // If /start command was received
     if (strncmp(Bot.received_msg.text, "/start", strlen("/start")) == 0)
     {
+
+      u8g2.drawUTF8(0, 15, "/start");
+      u8g2.sendBuffer();
 
       //Serial.printf("  From user name: %s %s\n", Bot.received_msg.from.first_name,Bot.received_msg.from.last_name);
 
@@ -31,6 +40,9 @@ void telegramBotHandler() {
     // If /help command was received
     else if (strncmp(Bot.received_msg.text, "/help", strlen("/help")) == 0)
     {
+      u8g2.drawUTF8(0, 15, "/help");
+      u8g2.sendBuffer();
+
       strcpy(TelegramMessage, "Hello ");
       strcat(TelegramMessage, Bot.received_msg.from.first_name);
       Bot.sendMessage(Bot.received_msg.chat.id, TelegramMessage);
@@ -41,6 +53,8 @@ void telegramBotHandler() {
     // If /time command was received
     else if (strncmp(Bot.received_msg.text, "/time", strlen("/time")) == 0)
     {
+      u8g2.drawUTF8(0, 15, "/time");
+      u8g2.sendBuffer();
 
       time_t now = time(nullptr);   //  time_t is used to store the number of seconds since the epoch (normally 01/01/1970)
       Bot.sendMessage(Bot.received_msg.chat.id, ctime(&now));
@@ -100,6 +114,9 @@ void telegramBotHandler() {
     // If /address command was received
     else if (strncmp(Bot.received_msg.text, "/address", strlen("/address")) == 0)
     {
+      u8g2.drawUTF8(0, 15, "/address");
+      u8g2.sendBuffer();
+
       strcpy(TelegramMessage, "Faucet Address: ");
       strcat(TelegramMessage, FaucetAddress);
       Bot.sendMessage(Bot.received_msg.chat.id, TelegramMessage);
@@ -109,6 +126,10 @@ void telegramBotHandler() {
     // If /balance command was received
     else if (strncmp(Bot.received_msg.text, "/balance", strlen("/balance")) == 0)
     {
+
+      u8g2.drawUTF8(0, 15, "/balance");
+      u8g2.sendBuffer();
+
       //--------------------------------------------
       //  Retrieve Wallet Nonce and Balance
       getWallet();
@@ -164,6 +185,9 @@ void telegramBotHandler() {
     // If /request_ command was received
     else if (strncmp(Bot.received_msg.text, "/request_", strlen("/request_")) == 0)
     {
+      u8g2.drawUTF8(0, 15, "/request_ADDRESS");
+      u8g2.sendBuffer();
+
       String request = String(Bot.received_msg.text);
       if (request.charAt(9) == 'T')  {        //simple address verification
         String receiveaddress = request.substring(9, 9 + 34 + 1);       //Ark address is 34 digits long
@@ -172,9 +196,13 @@ void telegramBotHandler() {
         receiveaddress.toCharArray(receiveaddress_char, 34 + 1);
 
         if (Address::validate( Address(receiveaddress_char), BRIDGECHAIN_VERSION)) {
+          
           Serial.println("Address Validated");
         }
         else {
+          u8g2.drawUTF8(0, 30, "Invalid ADDRESS");
+          u8g2.sendBuffer();
+
           Serial.println("not a valid address");
           Bot.sendMessage(Bot.received_msg.chat.id, "That was not a valid Radians address");
           break;
@@ -188,7 +216,10 @@ void telegramBotHandler() {
 
         Serial.print("\nreceiveAddress char: ");
         Serial.print(receiveaddress_char);
-
+        
+          u8g2.drawUTF8(0, 30, "Sending Tokens..");
+          u8g2.sendBuffer();
+          
         //--------------------------------------------
         sendBridgechainTransaction();
       }

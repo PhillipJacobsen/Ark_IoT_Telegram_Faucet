@@ -16,6 +16,56 @@ void setup()
   Serial.begin(115200);           // Initialize Serial Connection for debug
   while ( !Serial && millis() < 20 );
 
+  //--------------------------------------------
+  // Initialize the graphics library.
+  u8g2.begin();
+  u8g2.setFont(u8g2_font_6x10_tf);
+  u8g2.setFontRefHeightExtendedText();
+  u8g2.setDrawColor(1);
+  u8g2.setFontPosTop();
+  u8g2.setFontDirection(0);
+
+  //u8g2.drawStr(0, 0, "Radians Faucet");
+  //u8g2.sendBuffer();
+  // list of fonts
+  //  https://github.com/olikraus/u8g2/wiki/fntlistall
+
+
+
+
+  u8g2.setFont(u8g2_font_cu12_t_cyrillic);
+  u8g2.drawUTF8(0, 49, "Ѧ");
+
+  u8g2.setFont(u8g2_font_unifont_t_symbols);
+  u8g2.drawUTF8(22, 50, "Made by FOLY");
+//  u8g2.drawGlyph(95, 5, 0x2661 );  /* dec 9731/hex 2603 Snowman */ //  00466   white heart:0x2661  black heart:2665   HEAVY BLACK HEART:2764
+//  u8g2.drawUTF8(35, 20, "by FOLY");
+
+
+  // https://www.avrfreaks.net/sites/default/files/forum_attachments/u8g2.h
+ // u8g2.setFont(u8g2_font_cu12_t_cyrillic);
+
+ // u8g2.drawUTF8(10, 50, "Ѧ");
+
+
+  //u8g2.drawUTF8(5, 20, "Snowman: ☃");
+  // u8g2.drawGlyph(5, 20, 0x0466);  /* dec 9731/hex 2603 Snowman */ //  00466
+
+
+  // unicode cheat sheet http://wiki.secondlife.com/wiki/Unicode_cheat_sheet
+  //  http://www.isthisthingon.org/unicode/index.phtml?glyph=0466
+
+  //https://forum.arduino.cc/index.php?topic=520417.0
+
+  //  u8g2.setFont(u8g2_font_unifont_t_symbols);
+  //  u8g2.drawGlyph(5, 40, 0x2661 );  /* dec 9731/hex 2603 Snowman */ //  00466   white heart:0x2661  black heart:2665   HEAVY BLACK HEART:2764
+
+  u8g2.sendBuffer();
+
+
+  // u8g2.clearBuffer();   // Clear the display buffer
+
+
   digitalWrite(LED_PIN, HIGH);    // Turn LED on
   pinMode(LED_PIN, OUTPUT);       // initialize on board LED control pin as an output.
   led_status = 0;
@@ -168,7 +218,7 @@ void onConnectionEstablished() {
 
     // Subscribe to "radians_faucet/request" via alternate callback format
     WiFiMQTTclient.subscribe("radians_faucet/request", MQTT_Request_Handler);
-    WiFiMQTTclient.publish("radians_faucet/status", "true",true);  //set retain = true
+    WiFiMQTTclient.publish("radians_faucet/status", "true", true); //set retain = true
   }
 
 }
