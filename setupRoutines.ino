@@ -16,6 +16,8 @@ void setup()
   Serial.begin(115200);           // Initialize Serial Connection for debug
   while ( !Serial && millis() < 20 );
 
+  FastLED.addLeds<NEOPIXEL, DATA_PIN>(leds, NUM_LEDS);  // GRB ordering is assumed
+
   //--------------------------------------------
   // Initialize the graphics library.
   u8g2.begin();
@@ -31,6 +33,10 @@ void setup()
   //  https://github.com/olikraus/u8g2/wiki/fntlistall
 
 
+  u8g2.setContrast(255);
+
+  u8g2.setFont(u8g2_font_unifont_t_symbols);
+  u8g2.drawUTF8(5, 20, "Radians Faucet");
 
 
   u8g2.setFont(u8g2_font_cu12_t_cyrillic);
@@ -38,14 +44,14 @@ void setup()
 
   u8g2.setFont(u8g2_font_unifont_t_symbols);
   u8g2.drawUTF8(22, 50, "Made by FOLY");
-//  u8g2.drawGlyph(95, 5, 0x2661 );  /* dec 9731/hex 2603 Snowman */ //  00466   white heart:0x2661  black heart:2665   HEAVY BLACK HEART:2764
-//  u8g2.drawUTF8(35, 20, "by FOLY");
+  //  u8g2.drawGlyph(95, 5, 0x2661 );  /* dec 9731/hex 2603 Snowman */ //  00466   white heart:0x2661  black heart:2665   HEAVY BLACK HEART:2764
+  //  u8g2.drawUTF8(35, 20, "by FOLY");
 
 
   // https://www.avrfreaks.net/sites/default/files/forum_attachments/u8g2.h
- // u8g2.setFont(u8g2_font_cu12_t_cyrillic);
+  // u8g2.setFont(u8g2_font_cu12_t_cyrillic);
 
- // u8g2.drawUTF8(10, 50, "Ѧ");
+  // u8g2.drawUTF8(10, 50, "Ѧ");
 
 
   //u8g2.drawUTF8(5, 20, "Snowman: ☃");
@@ -66,7 +72,7 @@ void setup()
   // u8g2.clearBuffer();   // Clear the display buffer
 
 
-  digitalWrite(LED_PIN, HIGH);    // Turn LED on
+  digitalWrite(LED_PIN, LOW);     // Turn LED off
   pinMode(LED_PIN, OUTPUT);       // initialize on board LED control pin as an output.
   led_status = 0;
 
@@ -124,8 +130,23 @@ void MQTT_Request_Handler (const String & payload) {
 
 }
 
+/********************************************************************************
+********************************************************************************/
+// Handler for receiving Block Applied MQTT message
+void Block_Applied_Handler (const String & payload) {
+    Serial.print("received MQTT topic radians/parsed_events/block_applied: ");
+    Serial.println(payload);
+  New_Block_Event = true;
+  New_Block_Event_FadeState = 0;
+  previousUpdateTime_LEDfade = millis();
+  LED_Fade_Brightness = 0;
+  FastLED.setBrightness(LED_Fade_Brightness);   //turn on all LEDs and set brightness to 0
+  for (int i = 0; i < NUM_LEDS; i++) {
+    leds[i] = CRGB::Blue;
+    FastLED.show();
+  }
 
-
+}
 
 /********************************************************************************
   This function is called once WiFi and MQTT connections are complete
@@ -141,7 +162,7 @@ void onConnectionEstablished() {
 
     //--------------------------------------------
     //  display IP address.
-    Serial.println("\nIP address: ");
+    Serial.print("\nIP address: ");
     Serial.println(WiFi.localIP());
 
     //    // Subscribe to "IOT/set" and display received message to Serial
@@ -158,9 +179,10 @@ void onConnectionEstablished() {
     //    });
 
     // Subscribe to "radians_faucet/request" via alternate callback format
-    WiFiMQTTclient.subscribe("radians_faucet/request", MQTT_Request_Handler);
+    //   WiFiMQTTclient.subscribe("radians_faucet/request", MQTT_Request_Handler);
+    WiFiMQTTclient.subscribe("radians/parsed_events/block_applied", Block_Applied_Handler);
 
-    WiFiMQTTclient.publish("radians_faucet/status", "true");
+    WiFiMQTTclient.publish("radians/parsed_events/status", "true", true); //set retain = true
 
     Serial.println("");
     Serial.println(WiFiMQTTclient.getMqttClientName());
@@ -200,15 +222,16 @@ void onConnectionEstablished() {
 
     //--------------------------------------------
     // Get Telegram Bot account info
-    Bot.getMe();
+    //    Bot.getMe();
 
     //--------------------------------------------
     // Set Telegram Bot /Start message
 
     // Send a Telegram message for start
     delay(100);
-    Bot.sendMessage(telegram_chat_id, TEXT_START);
+    //    Bot.sendMessage(telegram_chat_id, TEXT_START);
 
+    previousUpdateTime_TelegramBot = millis();
 
 
 
@@ -217,8 +240,9 @@ void onConnectionEstablished() {
   else {
 
     // Subscribe to "radians_faucet/request" via alternate callback format
-    WiFiMQTTclient.subscribe("radians_faucet/request", MQTT_Request_Handler);
-    WiFiMQTTclient.publish("radians_faucet/status", "true", true); //set retain = true
+    WiFiMQTTclient.subscribe("radians/parsed_events/block_applied", Block_Applied_Handler);
+    //    WiFiMQTTclient.subscribe("radians_faucet/request", MQTT_Request_Handler);
+    WiFiMQTTclient.publish("radians/parsed_events/status", "true", true); //set retain = true
   }
 
 }
