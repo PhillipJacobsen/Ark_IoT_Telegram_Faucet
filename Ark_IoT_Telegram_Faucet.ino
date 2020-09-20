@@ -32,7 +32,7 @@ const int BAT_PIN = 35;     //ADC connected to Battery input pin (A13 = 35;)
                             Watchdog Timer
 ********************************************************************************/
 #include <esp_task_wdt.h>
-#define WDT_TIMEOUT 12    //12 seconds
+#define WDT_TIMEOUT 60    //60 seconds
 
 
 /********************************************************************************
@@ -261,7 +261,7 @@ void StateMachine();
   MAIN LOOP
 ********************************************************************************/
 void loop() {
-  //reset watchdog timer(set at 12 seconds)
+  //reset watchdog timer(set at 15 seconds)
   esp_task_wdt_reset();
 
   //--------------------------------------------
