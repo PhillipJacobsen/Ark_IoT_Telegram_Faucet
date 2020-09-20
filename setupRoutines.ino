@@ -16,6 +16,10 @@ void setup()
   Serial.begin(115200);           // Initialize Serial Connection for debug
   while ( !Serial && millis() < 20 );
 
+  Serial.println("Configuring WDT...");
+  esp_task_wdt_init(WDT_TIMEOUT, true); //enable panic so ESP32 restarts
+  esp_task_wdt_add(NULL); //add current thread to WDT watch  
+
   //--------------------------------------------
   // Initialize the graphics library.
   u8g2.begin();
@@ -35,7 +39,7 @@ void setup()
 
   u8g2.setFont(u8g2_font_unifont_t_symbols);
   u8g2.drawUTF8(5, 20, "Radians Faucet");
-  
+
 
   u8g2.setFont(u8g2_font_cu12_t_cyrillic);
   u8g2.drawUTF8(0, 49, "Ѧ");
@@ -78,7 +82,11 @@ void setup()
   WiFiMQTTclient.enableDebuggingMessages(); // Enable debugging messages sent to serial output
   //  WiFiMQTTclient.enableHTTPWebUpdater(); // Enable the web updater. User and password default to values of MQTTUsername and MQTTPassword. These can be overwritten with enableHTTPWebUpdater("user", "password").
   WiFiMQTTclient.enableLastWillMessage("radians_faucet/status", "false");  // You can activate the retain flag by setting the third parameter to true
+
+#ifdef _ENABLE_MQTT_BOT
   WiFiMQTTclient.enableMQTTConnect();
+#endif
+
   WiFiMQTTclient.enableMACaddress_for_ClientName();
 
 
@@ -161,9 +169,10 @@ void onConnectionEstablished() {
     //      Serial.println(topic + ": " + payload);
     //    });
 
+
+#ifdef _ENABLE_MQTT_BOT
     // Subscribe to "radians_faucet/request" via alternate callback format
     WiFiMQTTclient.subscribe("radians_faucet/request", MQTT_Request_Handler);
-
     WiFiMQTTclient.publish("radians_faucet/status", "true");
 
     Serial.println("");
@@ -171,7 +180,7 @@ void onConnectionEstablished() {
     Serial.println(WiFiMQTTclient.getMqttServerIp());
     Serial.println(WiFiMQTTclient.getMqttServerPort());
     Serial.println(WiFiMQTTclient.getConnectionEstablishedCount());
-
+#endif
 
 
 
@@ -213,7 +222,7 @@ void onConnectionEstablished() {
     delay(100);
     Bot.sendMessage(telegram_chat_id, TEXT_START);
 
-    previousUpdateTime_TelegramBot = millis();
+    previousUpdateTime_TelegramBot = millis() - UpdateInterval_TelegramBot;
 
 
 
@@ -222,9 +231,12 @@ void onConnectionEstablished() {
 
   else {
 
+#ifdef _ENABLE_MQTT_BOT
     // Subscribe to "radians_faucet/request" via alternate callback format
     WiFiMQTTclient.subscribe("radians_faucet/request", MQTT_Request_Handler);
     WiFiMQTTclient.publish("radians_faucet/status", "true", true); //set retain = true
+#endif
+  previousUpdateTime_TelegramBot = millis() - UpdateInterval_TelegramBot;   //poll Telegram bot as soon as possible after new connection
   }
 
 }

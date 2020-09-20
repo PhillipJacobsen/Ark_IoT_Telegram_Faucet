@@ -14,6 +14,9 @@ char* MQTT_CLIENT_NAME =  "TestClient";
 //#define WIFI_SSID         "TELUS6428"
 //#define WIFI_PASS         "3mmkgc9gn2"
 
+//#define _ENABLE_TG_BOT
+//#define _ENABLE_MQTT_BOT
+
 //configure Telegram
 // Telegram Bot Token (Get from Botfather)
 #define TLG_TOKEN "833803898:AAG9mcKAEzdd7W7p_RtjIZqp48Lt4X-tTMw"

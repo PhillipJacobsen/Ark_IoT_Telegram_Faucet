@@ -21,6 +21,10 @@ void StateMachine() {
           Serial.print("\nState: ");
           Serial.println(state);
           Serial.println("WiFi Connected");
+
+#ifndef _ENABLE_MQTT_BOT
+          onConnectionEstablished();
+#endif
         }
         else {
           state = STATE_0;
@@ -44,7 +48,7 @@ void StateMachine() {
           Serial.print("\nState: ");
           Serial.println(state);
           Serial.println("MQTT Connected");
-          
+
         }
         else {
           state = STATE_1;

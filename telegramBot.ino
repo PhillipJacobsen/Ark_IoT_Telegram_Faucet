@@ -18,7 +18,7 @@ void telegramBotHandler() {
     //Serial.println(Bot.received_msg.text);
     //Serial.println("");
 
-    char TelegramMessage[100] = {0};
+    char TelegramMessage[200] = {0};
     //--------------------------------------------
     // If /start command was received
     if (strncmp(Bot.received_msg.text, "/start", strlen("/start")) == 0)

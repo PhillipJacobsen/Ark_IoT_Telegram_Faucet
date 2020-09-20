@@ -28,6 +28,12 @@
 const int LED_PIN = 25;     //LED integrated on Heltec WiFi Kit
 const int BAT_PIN = 35;     //ADC connected to Battery input pin (A13 = 35;)
 
+/********************************************************************************
+                            Watchdog Timer
+********************************************************************************/
+#include <esp_task_wdt.h>
+#define WDT_TIMEOUT 12    //12 seconds
+
 
 /********************************************************************************
                               Various Global Variables
@@ -60,6 +66,7 @@ uTLGBot Bot(TLG_TOKEN);
 
 //Changed this in utlgbotlib.h
 // Telegram getUpdate Long Poll value (s)
+//Set the is 5 if running with MQTT bot. Set it to 10 if running by itself
 //#define TELEGRAM_LONG_POLL 5      //default is 10
 
 /*
@@ -90,7 +97,7 @@ uTLGBot Bot(TLG_TOKEN);
 /********************************************************************************
   Update Intervals for various algorithms
 ********************************************************************************/
-uint32_t UpdateInterval_TelegramBot = 5100;
+uint32_t UpdateInterval_TelegramBot = 11000;   //set this to 5100 if using MQTT plugin. Set it to 11000 seconds if not.
 uint32_t previousUpdateTime_TelegramBot = millis();
 
 /********************************************************************************
@@ -166,7 +173,7 @@ const char TEXT_HELP[] =
   "Available Commands:\n"
   // "/start - Show Bot startup message .\n"
   "/help - Show available commands.\n"
-  "/time - Returns the time.\n"
+  //  "/time - Returns the time.\n"
   //  "/ledon - Turn on the LED.\n"
   //  "/ledoff - Turn off the LED.\n"
   //  "/ledstatus - Show actual LED status.\n"
@@ -254,6 +261,8 @@ void StateMachine();
   MAIN LOOP
 ********************************************************************************/
 void loop() {
+  //reset watchdog timer(set at 12 seconds)
+  esp_task_wdt_reset();
 
   //--------------------------------------------
   // Process state machine
@@ -275,7 +284,10 @@ void loop() {
 
     if (millis() - previousUpdateTime_TelegramBot > UpdateInterval_TelegramBot)  {
       previousUpdateTime_TelegramBot += UpdateInterval_TelegramBot;
-      telegramBotHandler();
+
+      if (WiFiMQTTclient.isWifiConnected()) {          //make sure wifi is connected 
+        telegramBotHandler();
+      }
     }
 
   }

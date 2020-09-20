@@ -69,7 +69,7 @@ bool checkArkNodeStatus() {
 void getWallet() {
   const auto walletGetResponse = connection.api.wallets.get(FaucetAddress);
 
-  const size_t capacity = JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(6) + 200;
+  const size_t capacity = JSON_OBJECT_SIZE(1) + JSON_OBJECT_SIZE(6) + 250;
   DynamicJsonDocument doc(capacity);
 
   deserializeJson(doc, walletGetResponse.c_str());
