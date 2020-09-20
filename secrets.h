@@ -1,6 +1,6 @@
 
 #define MQTT_SERVER_IP    "40.85.223.207"
-#define MQTT_USERNAME     "ESP32_General"
+#define MQTT_USERNAME     "MQTTFaucet"
 #define MQTT_PASSWORD     "MagpieCrow77"
 //#define MQTT_CLIENT_NAME  "TestClient"
 char* MQTT_CLIENT_NAME =  "TestClient";
