@@ -31,21 +31,25 @@ void setup()
   //  https://github.com/olikraus/u8g2/wiki/fntlistall
 
 
+  u8g2.setContrast(255);
 
+  u8g2.setFont(u8g2_font_unifont_t_symbols);
+  u8g2.drawUTF8(5, 20, "Radians Faucet");
+  
 
   u8g2.setFont(u8g2_font_cu12_t_cyrillic);
   u8g2.drawUTF8(0, 49, "Ѧ");
 
   u8g2.setFont(u8g2_font_unifont_t_symbols);
   u8g2.drawUTF8(22, 50, "Made by FOLY");
-//  u8g2.drawGlyph(95, 5, 0x2661 );  /* dec 9731/hex 2603 Snowman */ //  00466   white heart:0x2661  black heart:2665   HEAVY BLACK HEART:2764
-//  u8g2.drawUTF8(35, 20, "by FOLY");
+  //  u8g2.drawGlyph(95, 5, 0x2661 );  /* dec 9731/hex 2603 Snowman */ //  00466   white heart:0x2661  black heart:2665   HEAVY BLACK HEART:2764
+  //  u8g2.drawUTF8(35, 20, "by FOLY");
 
 
   // https://www.avrfreaks.net/sites/default/files/forum_attachments/u8g2.h
- // u8g2.setFont(u8g2_font_cu12_t_cyrillic);
+  // u8g2.setFont(u8g2_font_cu12_t_cyrillic);
 
- // u8g2.drawUTF8(10, 50, "Ѧ");
+  // u8g2.drawUTF8(10, 50, "Ѧ");
 
 
   //u8g2.drawUTF8(5, 20, "Snowman: ☃");
@@ -141,7 +145,7 @@ void onConnectionEstablished() {
 
     //--------------------------------------------
     //  display IP address.
-    Serial.println("\nIP address: ");
+    Serial.print("\nIP address: ");
     Serial.println(WiFi.localIP());
 
     //    // Subscribe to "IOT/set" and display received message to Serial
@@ -208,6 +212,8 @@ void onConnectionEstablished() {
     // Send a Telegram message for start
     delay(100);
     Bot.sendMessage(telegram_chat_id, TEXT_START);
+
+    previousUpdateTime_TelegramBot = millis();
 
 
 

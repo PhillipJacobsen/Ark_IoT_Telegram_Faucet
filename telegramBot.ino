@@ -4,7 +4,8 @@ void telegramBotHandler() {
     
   while (Bot.getUpdates())
   {
-
+    u8g2.clearBuffer();
+    u8g2.sendBuffer();
 
     telegram_PrintMsgDetails();
     u8g2.setFont(u8g2_font_unifont_t_symbols);

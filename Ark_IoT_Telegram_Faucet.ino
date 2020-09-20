@@ -90,7 +90,7 @@ uTLGBot Bot(TLG_TOKEN);
 /********************************************************************************
   Update Intervals for various algorithms
 ********************************************************************************/
-uint32_t UpdateInterval_TelegramBot = 5100;           
+uint32_t UpdateInterval_TelegramBot = 5100;
 uint32_t previousUpdateTime_TelegramBot = millis();
 
 /********************************************************************************
@@ -270,11 +270,14 @@ void loop() {
 
   //--------------------------------------------
   // Check for Telegram Bot received messages
-  if (millis() - previousUpdateTime_TelegramBot > UpdateInterval_TelegramBot)  {
-    previousUpdateTime_TelegramBot += UpdateInterval_TelegramBot;
-    telegramBotHandler();
+
+  if (initialConnectionEstablished_Flag) {
+
+    if (millis() - previousUpdateTime_TelegramBot > UpdateInterval_TelegramBot)  {
+      previousUpdateTime_TelegramBot += UpdateInterval_TelegramBot;
+      telegramBotHandler();
+    }
+
   }
-
-
 
 }
