@@ -3,7 +3,7 @@
 #define MQTT_USERNAME     "MQTTFaucet"
 #define MQTT_PASSWORD     "MagpieCrow77"
 //#define MQTT_CLIENT_NAME  "TestClient"
-char* MQTT_CLIENT_NAME =  "TestClient";
+char* MQTT_CLIENT_NAME =  "TelegramFaucet";
 #define MQTT_SERVER_PORT  1883
 
 //h

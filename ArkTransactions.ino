@@ -154,7 +154,6 @@ void sendBridgechainTransaction() {
   deserializeJson(doc, sendResponse.c_str());
   JsonObject data = doc["data"];
   const char* data_accept_0 = data["accept"][0]; // "bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2"
-  //  const char* data_broadcast_0 = data["broadcast"][0]; // "bd0f614f1de28788d048ac3d289878aa0297dbf6e8ebf5fbfc49c316983aa5f2"
 
   //need to add more error handling here!
   if ((data_accept_0 != NULL) && (data_accept_0[0] == '\0')) {
@@ -163,13 +162,10 @@ void sendBridgechainTransaction() {
   }
 
 
-  yield();
+  //yield();
   Bot.sendMessage(Bot.received_msg.chat.id, "Tokens have been sent");
 
-  //Bot.sendMessage(Bot.received_msg.chat.id, "TransactionID:");
-  //Bot.sendMessage(Bot.received_msg.chat.id, data_accept_0);
-
-  char explorerlink[150];
+  char explorerlink[200];
   strcpy(explorerlink, "TransactionID:  ");
   strcat(explorerlink, "https://explorer.radians.nl/transaction/");
   strcat(explorerlink, data_accept_0);
